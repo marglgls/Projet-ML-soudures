@@ -2,221 +2,891 @@
   "1": {
     "label": "Carbon concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 0,
+      "pct": 0.0
+    },
+    "observed": {
+      "n_unique": 81,
+      "min": 0.029,
+      "max": 0.18
+    }
   },
   "2": {
     "label": "Silicon concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 0,
+      "pct": 0.0
+    },
+    "observed": {
+      "n_unique": 68,
+      "min": 0.04,
+      "max": 1.14
+    }
   },
   "3": {
     "label": "Manganese concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 0,
+      "pct": 0.0
+    },
+    "observed": {
+      "n_unique": 147,
+      "min": 0.27,
+      "max": 2.25
+    }
   },
   "4": {
     "label": "Sulphur concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 4,
+      "pct": 0.24
+    },
+    "observed": {
+      "n_unique": 36,
+      "min": 0.001,
+      "max": 0.14,
+      "censored_tokens": [
+        "<0.002"
+      ],
+      "note": "One left-censored token '<0.002'; parse as below-detection-limit, not numeric."
+    }
   },
   "5": {
     "label": "Phosphorus concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 10,
+      "pct": 0.61
+    },
+    "observed": {
+      "n_unique": 35,
+      "min": 0.002,
+      "max": 0.25
+    }
   },
   "6": {
     "label": "Nickel concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 955,
+      "pct": 57.81
+    },
+    "observed": {
+      "n_unique": 101,
+      "min": 0.0,
+      "max": 3.5
+    }
   },
   "7": {
     "label": "Chromium concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 868,
+      "pct": 52.54
+    },
+    "observed": {
+      "n_unique": 122,
+      "min": 0.0,
+      "max": 10.2,
+      "note": "Max ~10.2 wt% corresponds to 9Cr-type welds (e.g. Birmingham-MAX39 row)."
+    }
   },
   "8": {
     "label": "Molybdenum concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 859,
+      "pct": 52.0
+    },
+    "observed": {
+      "n_unique": 85,
+      "min": 0.0,
+      "max": 1.5,
+      "censored_tokens": [
+        "<0.01"
+      ]
+    }
   },
   "9": {
     "label": "Vanadium concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 724,
+      "pct": 43.83
+    },
+    "observed": {
+      "n_unique": 82,
+      "min": 0.0,
+      "max": 0.32,
+      "censored_tokens": [
+        "<0.0005",
+        "<0.005",
+        "<0.01",
+        "<5"
+      ],
+      "note": "'<5' is a unit-ambiguous detection-limit token; do not cast directly to float."
+    }
   },
   "10": {
     "label": "Copper concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 1074,
+      "pct": 65.01
+    },
+    "observed": {
+      "n_unique": 77,
+      "min": 0.0,
+      "max": 1.63,
+      "censored_tokens": [
+        "<0.01"
+      ]
+    }
   },
   "11": {
     "label": "Cobalt concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition. Very sparse: only ~7.8% reported.",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 1523,
+      "pct": 92.19
+    },
+    "observed": {
+      "n_unique": 14,
+      "min": 0.0,
+      "max": 2.8,
+      "censored_tokens": [
+        "<0.01"
+      ]
+    }
   },
   "12": {
     "label": "Tungsten concentration",
     "unit": "wt%",
-    "details": "Chemical composition"
+    "details": "Chemical composition. Very sparse: only ~4.5% reported.",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 1577,
+      "pct": 95.46
+    },
+    "observed": {
+      "n_unique": 7,
+      "min": 0.0,
+      "max": 2.99,
+      "censored_tokens": [
+        "<0.1"
+      ]
+    }
   },
   "13": {
     "label": "Oxygen concentration",
     "unit": "ppmw",
-    "details": "Chemical composition, parts per million by weight"
+    "details": "Chemical composition, parts per million by weight",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 396,
+      "pct": 23.97
+    },
+    "observed": {
+      "n_unique": 268,
+      "min": 132.0,
+      "max": 1650.0
+    }
   },
   "14": {
     "label": "Titanium concentration",
     "unit": "ppmw",
-    "details": "Chemical composition, parts per million by weight"
+    "details": "Chemical composition, parts per million by weight",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 717,
+      "pct": 43.4
+    },
+    "observed": {
+      "n_unique": 91,
+      "min": 0.0,
+      "max": 690.0,
+      "censored_tokens": [
+        "<0.01",
+        "<5",
+        "<10",
+        "<100"
+      ],
+      "note": "Mix of plain ppmw values and '<' detection-limit tokens; mixed magnitude suggests occasional unit/reporting inconsistency, check outliers (e.g. 0 vs <0.01)."
+    }
   },
   "15": {
     "label": "Nitrogen concentration",
     "unit": "ppmw",
-    "details": "Chemical composition, parts per million by weight"
+    "details": "Chemical composition, parts per million by weight",
+    "type": "continuous_with_encoding_quirk",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 410,
+      "pct": 24.82
+    },
+    "observed": {
+      "n_unique": 161,
+      "numeric_range": {
+        "min": 21.0,
+        "max": 552.0
+      },
+      "non_numeric_tokens": [
+        "48tot18res",
+        "50tot17res",
+        "52tot18res",
+        "54tot24res",
+        "54totndres",
+        "61tot34res",
+        "66totndres",
+        "67tot33res"
+      ],
+      "note": "59 rows use 'NNtotMMres' encoding (total vs residual/filtered N, 'nd' = not determined), e.g. '67tot33res'. Requires a parsing decision (use total, residual, or split into two features) before numeric modelling."
+    }
   },
   "16": {
     "label": "Aluminium concentration",
     "unit": "ppmw",
-    "details": "Chemical composition, parts per million by weight"
+    "details": "Chemical composition, parts per million by weight",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 747,
+      "pct": 45.22
+    },
+    "observed": {
+      "n_unique": 76,
+      "min": 0.004,
+      "max": 680.0,
+      "censored_tokens": [
+        "<0.01",
+        "<5",
+        "<50",
+        "<100"
+      ]
+    }
   },
   "17": {
     "label": "Boron concentration",
     "unit": "ppmw",
-    "details": "Chemical composition, parts per million by weight"
+    "details": "Chemical composition, parts per million by weight",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 1148,
+      "pct": 69.49
+    },
+    "observed": {
+      "n_unique": 30,
+      "min": 1.0,
+      "max": 69.0,
+      "censored_tokens": [
+        "<5",
+        "<10"
+      ]
+    }
   },
   "18": {
     "label": "Niobium concentration",
     "unit": "ppmw",
-    "details": "Chemical composition, parts per million by weight"
+    "details": "Chemical composition, parts per million by weight",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 900,
+      "pct": 54.48
+    },
+    "observed": {
+      "n_unique": 63,
+      "min": 0.0,
+      "max": 1000.0,
+      "censored_tokens": [
+        "<5",
+        "<6",
+        "<50",
+        "<100"
+      ]
+    }
   },
   "19": {
     "label": "Tin concentration",
     "unit": "ppmw",
-    "details": "Chemical composition, parts per million by weight"
+    "details": "Chemical composition, parts per million by weight. Very sparse (~18% reported).",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 1356,
+      "pct": 82.08
+    },
+    "observed": {
+      "n_unique": 20,
+      "min": 0.0,
+      "max": 1000.0,
+      "censored_tokens": [
+        "<10",
+        "<100"
+      ]
+    }
   },
   "20": {
     "label": "Arsenic concentration",
     "unit": "ppmw",
-    "details": "Chemical composition, parts per million by weight"
+    "details": "Chemical composition, parts per million by weight. Very sparse (~14% reported).",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 1418,
+      "pct": 85.84
+    },
+    "observed": {
+      "n_unique": 19,
+      "min": 0.003,
+      "max": 200.0,
+      "censored_tokens": [
+        "<100"
+      ]
+    }
   },
   "21": {
     "label": "Antimony concentration",
     "unit": "ppmw",
-    "details": "Chemical composition, parts per million by weight"
+    "details": "Chemical composition, parts per million by weight. Very sparse (~15% reported).",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 1392,
+      "pct": 84.26
+    },
+    "observed": {
+      "n_unique": 24,
+      "min": 0.0,
+      "max": 200.0,
+      "censored_tokens": [
+        "<10",
+        "<100"
+      ]
+    }
   },
   "22": {
     "label": "Current",
     "unit": "A",
-    "details": "Welding parameter"
+    "details": "Welding parameter",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 248,
+      "pct": 15.01
+    },
+    "observed": {
+      "n_unique": 37,
+      "min": 115.0,
+      "max": 900.0,
+      "note": "Missing jointly with Voltage (same 248 rows); strongly clustered values (170, 500-700 A bands reflect literature sources)."
+    }
   },
   "23": {
     "label": "Voltage",
     "unit": "V",
-    "details": "Welding parameter"
+    "details": "Welding parameter",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 248,
+      "pct": 15.01
+    },
+    "observed": {
+      "n_unique": 24,
+      "min": 11.5,
+      "max": 75.36
+    }
   },
   "24": {
     "label": "AC or DC",
     "unit": null,
-    "details": "Welding parameter, current type: AC or DC"
+    "details": "Welding parameter, current type: AC or DC",
+    "type": "categorical",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 215,
+      "pct": 13.01
+    },
+    "observed": {
+      "categories": {
+        "DC": 1395,
+        "AC": 42
+      },
+      "note": "Heavily imbalanced toward DC."
+    }
   },
   "25": {
     "label": "Electrode polarity",
     "unit": null,
-    "details": "Welding parameter, electrode positive or negative"
+    "details": "Welding parameter, electrode positive (+) or negative (-); '0' means no polarity (AC only).",
+    "type": "categorical",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 156,
+      "pct": 9.44
+    },
+    "observed": {
+      "categories": {
+        "+": 1451,
+        "0": 38,
+        "-": 7
+      },
+      "note": "Cross-check in data: '0' occurs only with AC (38 rows); '+' occurs with DC (1388) + a few AC (4); '-' only with DC (7). Jointly missing with col 24 on 156 rows."
+    }
   },
   "26": {
     "label": "Heat input",
     "unit": "kJ/mm",
-    "details": "Welding parameter, originally noted as kJmm-1"
+    "details": "Welding parameter, originally noted as kJmm-1 / kJ mm-1",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 0,
+      "pct": 0.0
+    },
+    "observed": {
+      "n_unique": 38,
+      "min": 0.6,
+      "max": 7.9
+    }
   },
   "27": {
     "label": "Interpass temperature",
     "unit": "°C",
-    "details": "Welding parameter"
+    "details": "Welding parameter",
+    "type": "continuous_with_range_token",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 0,
+      "pct": 0.0
+    },
+    "observed": {
+      "n_unique": 15,
+      "numeric_range": {
+        "min": 20.0,
+        "max": 300.0
+      },
+      "mode": "200 (1064 rows)",
+      "full_counts": {
+        "200": 1064,
+        "250": 171,
+        "300": 118,
+        "150": 102,
+        "175": 52,
+        "100": 40,
+        "150-200": 38,
+        "210": 20,
+        "177": 16,
+        "107": 8,
+        "125": 6,
+        "225": 5,
+        "140": 4,
+        "20": 4,
+        "240": 4
+      },
+      "note": "'150-200' (38 rows) is a range token, not a single temperature; decide imputation (e.g. midpoint 175) before numeric modelling."
+    }
   },
   "28": {
     "label": "Type of weld",
     "unit": "enum",
-    "details": "Welding process: ShMA = MMA = manual metal arc; SA = SMA = submerged arc; FCA = flux cored arc; GTAA = gas tungsten arc automatic; GMAA = gas metal arc automatic; SAW-NG = submerged arc narrow gap; GMA-NG = gas metal arc narrow gap; ES = electroslag; TSA = tandem submerged arc"
+    "details": "Welding process: ShMA = MMA = manual metal arc; SA = SMA = submerged arc; FCA = flux cored arc; GTAA = gas tungsten arc automatic; GMAA = gas metal arc automatic; SAW-NG = submerged arc narrow gap; GMA-NG = gas metal arc narrow gap; ES = electroslag; TSA = tandem submerged arc",
+    "type": "categorical",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 0,
+      "pct": 0.0
+    },
+    "observed": {
+      "categories": {
+        "MMA": 1140,
+        "SA": 261,
+        "FCA": 87,
+        "TSA": 87,
+        "ShMA": 40,
+        "NGSAW": 18,
+        "NGGMA": 7,
+        "SAA": 4,
+        "GTAA": 4,
+        "GMAA": 4
+      },
+      "note": "File codes differ slightly from doc: SAW-NG appears as NGSAW, GMA-NG as NGGMA; SAA (4 rows) is an undocumented variant of SA; ShMA and MMA both mean manual metal arc (keep separate or merge as modelling choice). ES listed in doc but absent from data. Heavily imbalanced toward MMA."
+    }
   },
   "29": {
     "label": "Post weld heat treatment temperature",
     "unit": "°C",
-    "details": "Post weld heat treatment (PWHT) temperature"
+    "details": "Post weld heat treatment (PWHT) temperature; 0 = as-welded (no PWHT), consistent with col 30 = 0.",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 13,
+      "pct": 0.79
+    },
+    "observed": {
+      "n_unique": 19,
+      "min": 0.0,
+      "max": 760.0,
+      "note": "0.0 in 610 rows (as-welded); otherwise common plateaus at 250/14h, 580/2h, 690/1-24h, 750/2-8h. Jointly missing with col 30 on the same 13 rows."
+    }
   },
   "30": {
     "label": "Post weld heat treatment time",
     "unit": "hours",
-    "details": "Post weld heat treatment (PWHT) time"
+    "details": "Post weld heat treatment (PWHT) time; 0 = as-welded (no PWHT), consistent with col 29 = 0.",
+    "type": "continuous",
+    "role": "input",
+    "missing": {
+      "token": "N",
+      "count": 13,
+      "pct": 0.79
+    },
+    "observed": {
+      "n_unique": 21,
+      "min": 0.0,
+      "max": 24.0,
+      "note": "0.0 in 610 rows (as-welded); pairs with col 29, e.g. (250,14), (580,2), (690,10)."
+    }
   },
   "31": {
     "label": "Yield strength",
     "unit": "MPa",
-    "details": "Mechanical property"
+    "details": "Mechanical property, room temperature. Candidate ML target.",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 872,
+      "pct": 52.78
+    },
+    "observed": {
+      "n_unique": 329,
+      "n_reported": 780,
+      "min": 315.0,
+      "max": 920.0
+    }
   },
   "32": {
     "label": "Ultimate tensile strength",
     "unit": "MPa",
-    "details": "Mechanical property"
+    "details": "Mechanical property, room temperature. Candidate ML target.",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 914,
+      "pct": 55.33
+    },
+    "observed": {
+      "n_unique": 306,
+      "n_reported": 738,
+      "min": 447.0,
+      "max": 1151.0
+    }
   },
   "33": {
     "label": "Elongation",
     "unit": "%",
-    "details": "Mechanical property"
+    "details": "Mechanical property. Candidate ML target.",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 952,
+      "pct": 57.63
+    },
+    "observed": {
+      "n_unique": 135,
+      "n_reported": 700,
+      "min": 10.6,
+      "max": 37.0
+    }
   },
   "34": {
     "label": "Reduction of Area",
     "unit": "%",
-    "details": "Mechanical property"
+    "details": "Mechanical property. Candidate ML target.",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 947,
+      "pct": 57.32
+    },
+    "observed": {
+      "n_unique": 122,
+      "n_reported": 705,
+      "min": 17.0,
+      "max": 83.0
+    }
   },
   "35": {
     "label": "Charpy temperature",
     "unit": "°C",
-    "details": "Toughness test condition"
+    "details": "Toughness test condition (test temperature for the paired Charpy energy in col 36), not a material property itself.",
+    "type": "continuous",
+    "role": "test_condition",
+    "missing": {
+      "token": "N",
+      "count": 773,
+      "pct": 46.79
+    },
+    "observed": {
+      "n_unique": 138,
+      "n_reported": 879,
+      "min": -114.0,
+      "max": 188.0,
+      "note": "Jointly present/missing with col 36 (same 879 reported rows); modelling Charpy energy must condition on this temperature."
+    }
   },
   "36": {
     "label": "Charpy impact toughness",
     "unit": "J",
-    "details": "Mechanical property, toughness"
+    "details": "Mechanical property, toughness (Charpy V-notch energy at the col-35 temperature). Candidate ML target (temperature-conditioned).",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 773,
+      "pct": 46.79
+    },
+    "observed": {
+      "n_unique": 167,
+      "n_reported": 879,
+      "min": 3.0,
+      "max": 270.0
+    }
   },
   "37": {
     "label": "Hardness",
     "unit": "kg/mm2",
-    "details": "Mechanical property, originally noted as kgmm-2"
+    "details": "Mechanical property, originally noted as kgmm-2 / kg mm-2. Mixed test scales in raw file.",
+    "type": "continuous_with_method_suffix",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 1514,
+      "pct": 91.65
+    },
+    "observed": {
+      "n_unique_raw_tokens": 96,
+      "n_reported": 138,
+      "plain_numeric": 80,
+      "numeric_range": {
+        "min": 154.0,
+        "max": 265.0
+      },
+      "suffixed_tokens": 58,
+      "suffix_breakdown": {
+        "Hv10": 38,
+        "(Hv30)": 16,
+        "Hv5": 4
+      },
+      "note": "Only ~8% reported; 58 values carry Vickers-load suffixes (e.g. '201Hv10', '143(Hv30)', '226Hv5'). Strip suffix for numeric modelling but keep load as a possible covariate; loads are not interchangeable."
+    }
   },
   "38": {
     "label": "50% FATT",
-    "unit": null,
-    "details": "50% Fracture Appearance Transition Temperature, no unit specified in source"
+    "unit": "°C",
+    "details": "50% Fracture Appearance Transition Temperature. Unit not stated in source doc; values are consistent with °C and treated as such here.",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 1621,
+      "pct": 98.12
+    },
+    "observed": {
+      "n_unique": 20,
+      "n_reported": 31,
+      "min": -126.0,
+      "max": 30.0,
+      "note": "Rarest target (31 values); unlikely to support supervised learning alone."
+    }
   },
   "39": {
     "label": "Primary ferrite in microstructure",
     "unit": "%",
-    "details": "Microstructure fraction"
+    "details": "Microstructure fraction",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 1554,
+      "pct": 94.07
+    },
+    "observed": {
+      "n_unique": 38,
+      "n_reported": 98,
+      "min": 0.0,
+      "max": 48.0,
+      "censored_tokens": [
+        "<1"
+      ]
+    }
   },
   "40": {
     "label": "Ferrite with second phase",
     "unit": "%",
-    "details": "Microstructure fraction"
+    "details": "Microstructure fraction",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 1562,
+      "pct": 94.55
+    },
+    "observed": {
+      "n_unique": 46,
+      "n_reported": 90,
+      "min": 3.0,
+      "max": 100.0
+    }
   },
   "41": {
     "label": "Acicular ferrite",
     "unit": "%",
-    "details": "Microstructure fraction"
+    "details": "Microstructure fraction",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 1562,
+      "pct": 94.55
+    },
+    "observed": {
+      "n_unique": 50,
+      "n_reported": 90,
+      "min": 0.0,
+      "max": 88.0
+    }
   },
   "42": {
     "label": "Martensite",
     "unit": "%",
-    "details": "Microstructure fraction"
+    "details": "Microstructure fraction. Nearly constant in reported rows.",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 1563,
+      "pct": 94.61
+    },
+    "observed": {
+      "n_unique": 2,
+      "n_reported": 89,
+      "categories": {
+        "0.0": 88,
+        "30.0": 1
+      }
+    }
   },
   "43": {
     "label": "Ferrite with carbide aggregate",
     "unit": "%",
-    "details": "Microstructure fraction, originally spelled 'Ferrite with carbide aggreagate' in source"
+    "details": "Microstructure fraction, originally spelled 'Ferrite with carbide aggreagate' in source",
+    "type": "continuous",
+    "role": "output",
+    "missing": {
+      "token": "N",
+      "count": 1563,
+      "pct": 94.61
+    },
+    "observed": {
+      "n_unique": 8,
+      "n_reported": 89,
+      "min": 0.0,
+      "max": 8.0
+    }
   },
   "44": {
     "label": "Weld ID",
     "unit": null,
-    "details": "Weld identifier"
+    "details": "Weld identifier: literature source + experiment code (e.g. 'Evans-Ni/CMn-1990/1991-0Aaw'). Not a feature; use for grouping/dedup and train-test splitting by source.",
+    "type": "identifier",
+    "role": "meta",
+    "missing": {
+      "token": "N",
+      "count": 0,
+      "pct": 0.0
+    },
+    "observed": {
+      "n_rows": 1652,
+      "n_unique": 1490,
+      "n_duplicated_ids": 91,
+      "max_rows_per_id": 5,
+      "note": "162 rows share an ID with another row (e.g. same weld tested as-welded + PWHT, or at several Charpy temperatures: '...-0Aaw' vs '...-0Aawch'). Do not split these across train/test naively. Top prefixes: Evans (700), SvenGret (96), Pat (79), EvansLetter (78)."
+    }
   }
 }
