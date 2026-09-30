@@ -1,0 +1,222 @@
+{
+  "1": {
+    "label": "Carbon concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "2": {
+    "label": "Silicon concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "3": {
+    "label": "Manganese concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "4": {
+    "label": "Sulphur concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "5": {
+    "label": "Phosphorus concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "6": {
+    "label": "Nickel concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "7": {
+    "label": "Chromium concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "8": {
+    "label": "Molybdenum concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "9": {
+    "label": "Vanadium concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "10": {
+    "label": "Copper concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "11": {
+    "label": "Cobalt concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "12": {
+    "label": "Tungsten concentration",
+    "unit": "wt%",
+    "details": "Chemical composition"
+  },
+  "13": {
+    "label": "Oxygen concentration",
+    "unit": "ppmw",
+    "details": "Chemical composition, parts per million by weight"
+  },
+  "14": {
+    "label": "Titanium concentration",
+    "unit": "ppmw",
+    "details": "Chemical composition, parts per million by weight"
+  },
+  "15": {
+    "label": "Nitrogen concentration",
+    "unit": "ppmw",
+    "details": "Chemical composition, parts per million by weight"
+  },
+  "16": {
+    "label": "Aluminium concentration",
+    "unit": "ppmw",
+    "details": "Chemical composition, parts per million by weight"
+  },
+  "17": {
+    "label": "Boron concentration",
+    "unit": "ppmw",
+    "details": "Chemical composition, parts per million by weight"
+  },
+  "18": {
+    "label": "Niobium concentration",
+    "unit": "ppmw",
+    "details": "Chemical composition, parts per million by weight"
+  },
+  "19": {
+    "label": "Tin concentration",
+    "unit": "ppmw",
+    "details": "Chemical composition, parts per million by weight"
+  },
+  "20": {
+    "label": "Arsenic concentration",
+    "unit": "ppmw",
+    "details": "Chemical composition, parts per million by weight"
+  },
+  "21": {
+    "label": "Antimony concentration",
+    "unit": "ppmw",
+    "details": "Chemical composition, parts per million by weight"
+  },
+  "22": {
+    "label": "Current",
+    "unit": "A",
+    "details": "Welding parameter"
+  },
+  "23": {
+    "label": "Voltage",
+    "unit": "V",
+    "details": "Welding parameter"
+  },
+  "24": {
+    "label": "AC or DC",
+    "unit": null,
+    "details": "Welding parameter, current type: AC or DC"
+  },
+  "25": {
+    "label": "Electrode polarity",
+    "unit": null,
+    "details": "Welding parameter, electrode positive or negative"
+  },
+  "26": {
+    "label": "Heat input",
+    "unit": "kJ/mm",
+    "details": "Welding parameter, originally noted as kJmm-1"
+  },
+  "27": {
+    "label": "Interpass temperature",
+    "unit": "°C",
+    "details": "Welding parameter"
+  },
+  "28": {
+    "label": "Type of weld",
+    "unit": "enum",
+    "details": "Welding process: ShMA = MMA = manual metal arc; SA = SMA = submerged arc; FCA = flux cored arc; GTAA = gas tungsten arc automatic; GMAA = gas metal arc automatic; SAW-NG = submerged arc narrow gap; GMA-NG = gas metal arc narrow gap; ES = electroslag; TSA = tandem submerged arc"
+  },
+  "29": {
+    "label": "Post weld heat treatment temperature",
+    "unit": "°C",
+    "details": "Post weld heat treatment (PWHT) temperature"
+  },
+  "30": {
+    "label": "Post weld heat treatment time",
+    "unit": "hours",
+    "details": "Post weld heat treatment (PWHT) time"
+  },
+  "31": {
+    "label": "Yield strength",
+    "unit": "MPa",
+    "details": "Mechanical property"
+  },
+  "32": {
+    "label": "Ultimate tensile strength",
+    "unit": "MPa",
+    "details": "Mechanical property"
+  },
+  "33": {
+    "label": "Elongation",
+    "unit": "%",
+    "details": "Mechanical property"
+  },
+  "34": {
+    "label": "Reduction of Area",
+    "unit": "%",
+    "details": "Mechanical property"
+  },
+  "35": {
+    "label": "Charpy temperature",
+    "unit": "°C",
+    "details": "Toughness test condition"
+  },
+  "36": {
+    "label": "Charpy impact toughness",
+    "unit": "J",
+    "details": "Mechanical property, toughness"
+  },
+  "37": {
+    "label": "Hardness",
+    "unit": "kg/mm2",
+    "details": "Mechanical property, originally noted as kgmm-2"
+  },
+  "38": {
+    "label": "50% FATT",
+    "unit": null,
+    "details": "50% Fracture Appearance Transition Temperature, no unit specified in source"
+  },
+  "39": {
+    "label": "Primary ferrite in microstructure",
+    "unit": "%",
+    "details": "Microstructure fraction"
+  },
+  "40": {
+    "label": "Ferrite with second phase",
+    "unit": "%",
+    "details": "Microstructure fraction"
+  },
+  "41": {
+    "label": "Acicular ferrite",
+    "unit": "%",
+    "details": "Microstructure fraction"
+  },
+  "42": {
+    "label": "Martensite",
+    "unit": "%",
+    "details": "Microstructure fraction"
+  },
+  "43": {
+    "label": "Ferrite with carbide aggregate",
+    "unit": "%",
+    "details": "Microstructure fraction, originally spelled 'Ferrite with carbide aggreagate' in source"
+  },
+  "44": {
+    "label": "Weld ID",
+    "unit": null,
+    "details": "Weld identifier"
+  }
+}
