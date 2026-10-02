@@ -13,7 +13,18 @@
     "observed": {
       "n_unique": 81,
       "min": 0.029,
-      "max": 0.18
+      "max": 0.18,
+      "mean": 0.0755,
+      "median": 0.074,
+      "outliers": {
+        "high": {
+          "count": 1,
+          "values": [
+            0.18
+          ],
+          "note": "Single max 0.18 is Birmingham-MAX39, the documented 9Cr-type special weld (see Cr note) — explained, not a typo."
+        }
+      }
     }
   },
   "2": {
@@ -30,7 +41,19 @@
     "observed": {
       "n_unique": 68,
       "min": 0.04,
-      "max": 1.14
+      "max": 1.14,
+      "mean": 0.3286,
+      "median": 0.32,
+      "outliers": {
+        "low": {
+          "count": 2,
+          "values": [
+            0.04,
+            0.07
+          ],
+          "note": "Two isolated low singles (Wolst-1974-AS0/AS1); 0.04 shares its row with the O maximum — old-source reporting level. High tail to 1.14 is stepped (mostly pairs), a systematic high-Si series, not outliers."
+        }
+      }
     }
   },
   "3": {
@@ -47,7 +70,18 @@
     "observed": {
       "n_unique": 147,
       "min": 0.27,
-      "max": 2.25
+      "max": 2.25,
+      "mean": 1.2028,
+      "median": 1.27,
+      "outliers": {
+        "low": {
+          "count": 1,
+          "values": [
+            0.27
+          ],
+          "note": "Single min 0.27 (Wolst-1974-AM1, next value 0.44); same 1974 source holds other dataset extremes (see O, Si, RoA notes)."
+        }
+      }
     }
   },
   "4": {
@@ -65,10 +99,22 @@
       "n_unique": 36,
       "min": 0.001,
       "max": 0.14,
+      "n_numeric": 1641,
+      "mean": 0.0096,
+      "median": 0.007,
       "censored_tokens": [
         "<0.002"
       ],
-      "note": "One left-censored token '<0.002'; parse as below-detection-limit, not numeric."
+      "note": "One left-censored token '<0.002'; parse as below-detection-limit, not numeric.",
+      "outliers": {
+        "high": {
+          "count": 10,
+          "values": [
+            0.14
+          ],
+          "note": "Plateau of 10 rows at 0.14 (Mart-G..Gi series, gap from next value 0.036); same 10 rows are the P maximum — deliberate high-impurity series. Keep together; do not drop as errors."
+        }
+      }
     }
   },
   "5": {
@@ -85,7 +131,18 @@
     "observed": {
       "n_unique": 35,
       "min": 0.002,
-      "max": 0.25
+      "max": 0.25,
+      "mean": 0.013,
+      "median": 0.01,
+      "outliers": {
+        "high": {
+          "count": 10,
+          "values": [
+            0.25
+          ],
+          "note": "Same 10 Mart- rows as the S plateau (gap from next value 0.075). Deliberate series."
+        }
+      }
     }
   },
   "6": {
@@ -102,7 +159,9 @@
     "observed": {
       "n_unique": 101,
       "min": 0.0,
-      "max": 3.5
+      "max": 3.5,
+      "mean": 0.415,
+      "median": 0.067
     }
   },
   "7": {
@@ -120,6 +179,8 @@
       "n_unique": 122,
       "min": 0.0,
       "max": 10.2,
+      "mean": 2.1013,
+      "median": 0.53,
       "note": "Max ~10.2 wt% corresponds to 9Cr-type welds (e.g. Birmingham-MAX39 row)."
     }
   },
@@ -138,6 +199,9 @@
       "n_unique": 85,
       "min": 0.0,
       "max": 1.5,
+      "n_numeric": 791,
+      "mean": 0.4804,
+      "median": 0.34,
       "censored_tokens": [
         "<0.01"
       ]
@@ -158,6 +222,9 @@
       "n_unique": 82,
       "min": 0.0,
       "max": 0.32,
+      "n_numeric": 620,
+      "mean": 0.0724,
+      "median": 0.015,
       "censored_tokens": [
         "<0.0005",
         "<0.005",
@@ -182,6 +249,9 @@
       "n_unique": 77,
       "min": 0.0,
       "max": 1.63,
+      "n_numeric": 564,
+      "mean": 0.1762,
+      "median": 0.03,
       "censored_tokens": [
         "<0.01"
       ]
@@ -202,9 +272,25 @@
       "n_unique": 14,
       "min": 0.0,
       "max": 2.8,
+      "n_numeric": 108,
+      "mean": 0.0829,
+      "median": 0.0,
       "censored_tokens": [
         "<0.01"
-      ]
+      ],
+      "outliers": {
+        "high": {
+          "count": 5,
+          "values": [
+            0.92,
+            0.95,
+            1.87,
+            1.89,
+            2.8
+          ],
+          "note": "Five isolated high singles vs bulk <=0.021 (n=108, mostly 0) — distinct high-Co alloy additions, not noise. Tiny group: keep in same fold."
+        }
+      }
     }
   },
   "12": {
@@ -222,9 +308,25 @@
       "n_unique": 7,
       "min": 0.0,
       "max": 2.99,
+      "n_numeric": 63,
+      "mean": 0.1408,
+      "median": 0.0,
       "censored_tokens": [
         "<0.1"
-      ]
+      ],
+      "outliers": {
+        "high": {
+          "count": 6,
+          "values": [
+            0.97,
+            0.98,
+            1.03,
+            1.92,
+            2.99
+          ],
+          "note": "Only 6 nonzero of 63 reported (57 zeros) — tungsten-alloyed additions, a separate cluster, not outliers."
+        }
+      }
     }
   },
   "13": {
@@ -241,7 +343,25 @@
     "observed": {
       "n_unique": 268,
       "min": 132.0,
-      "max": 1650.0
+      "max": 1650.0,
+      "mean": 441.9674,
+      "median": 423.0,
+      "outliers": {
+        "high": {
+          "count": 8,
+          "values": [
+            1020.0,
+            1070.0,
+            1100.0,
+            1150.0,
+            1180.0,
+            1300.0,
+            1440.0,
+            1650.0
+          ],
+          "note": "Isolated high singles above the 922 cluster (each x1); max 1650 (Wolst-1974-AS0) shares its row with the Si minimum. Low tail 132-218 (30 rows) is sparse but continuous — no flag."
+        }
+      }
     }
   },
   "14": {
@@ -259,6 +379,9 @@
       "n_unique": 91,
       "min": 0.0,
       "max": 690.0,
+      "n_numeric": 865,
+      "mean": 81.2688,
+      "median": 41.0,
       "censored_tokens": [
         "<0.01",
         "<5",
@@ -283,7 +406,10 @@
       "n_unique": 161,
       "numeric_range": {
         "min": 21.0,
-        "max": 552.0
+        "max": 552.0,
+        "n_numeric": 1183,
+        "mean": 113.3787,
+        "median": 83.0
       },
       "non_numeric_tokens": [
         "48tot18res",
@@ -313,6 +439,9 @@
       "n_unique": 76,
       "min": 0.004,
       "max": 680.0,
+      "n_numeric": 502,
+      "mean": 172.9265,
+      "median": 140.0,
       "censored_tokens": [
         "<0.01",
         "<5",
@@ -336,6 +465,9 @@
       "n_unique": 30,
       "min": 1.0,
       "max": 69.0,
+      "n_numeric": 85,
+      "mean": 20.6588,
+      "median": 17.0,
       "censored_tokens": [
         "<5",
         "<10"
@@ -357,6 +489,9 @@
       "n_unique": 63,
       "min": 0.0,
       "max": 1000.0,
+      "n_numeric": 453,
+      "mean": 217.0132,
+      "median": 120.0,
       "censored_tokens": [
         "<5",
         "<6",
@@ -380,10 +515,22 @@
       "n_unique": 20,
       "min": 0.0,
       "max": 1000.0,
+      "n_numeric": 291,
+      "mean": 41.7959,
+      "median": 40.0,
       "censored_tokens": [
         "<10",
         "<100"
-      ]
+      ],
+      "outliers": {
+        "high": {
+          "count": 2,
+          "values": [
+            1000.0
+          ],
+          "note": "Two rows at 1000.0 (5x above next value 200) are the same weld as-welded + heat-treated (Cunh-1982-7016aw3/ht3) — deliberate high-Sn pair, keep together; check unit consistency before transforms."
+        }
+      }
     }
   },
   "20": {
@@ -401,6 +548,9 @@
       "n_unique": 19,
       "min": 0.003,
       "max": 200.0,
+      "n_numeric": 226,
+      "mean": 28.6038,
+      "median": 10.0,
       "censored_tokens": [
         "<100"
       ]
@@ -421,6 +571,9 @@
       "n_unique": 24,
       "min": 0.0,
       "max": 200.0,
+      "n_numeric": 254,
+      "mean": 28.144,
+      "median": 10.0,
       "censored_tokens": [
         "<10",
         "<100"
@@ -442,6 +595,8 @@
       "n_unique": 37,
       "min": 115.0,
       "max": 900.0,
+      "mean": 283.8437,
+      "median": 170.0,
       "note": "Missing jointly with Voltage (same 248 rows); strongly clustered values (170, 500-700 A bands reflect literature sources)."
     }
   },
@@ -459,7 +614,9 @@
     "observed": {
       "n_unique": 24,
       "min": 11.5,
-      "max": 75.36
+      "max": 75.36,
+      "mean": 27.6074,
+      "median": 21.0
     }
   },
   "24": {
@@ -477,6 +634,13 @@
       "categories": {
         "DC": 1395,
         "AC": 42
+      },
+      "n_categories": 2,
+      "category_count_stats": {
+        "min": 42,
+        "max": 1395,
+        "mean": 718.5,
+        "median": 718.5
       },
       "note": "Heavily imbalanced toward DC."
     }
@@ -498,6 +662,13 @@
         "0": 38,
         "-": 7
       },
+      "n_categories": 3,
+      "category_count_stats": {
+        "min": 7,
+        "max": 1451,
+        "mean": 498.6667,
+        "median": 38
+      },
       "note": "Cross-check in data: '0' occurs only with AC (38 rows); '+' occurs with DC (1388) + a few AC (4); '-' only with DC (7). Jointly missing with col 24 on 156 rows."
     }
   },
@@ -515,7 +686,9 @@
     "observed": {
       "n_unique": 38,
       "min": 0.6,
-      "max": 7.9
+      "max": 7.9,
+      "mean": 1.701,
+      "median": 1.0
     }
   },
   "27": {
@@ -533,7 +706,10 @@
       "n_unique": 15,
       "numeric_range": {
         "min": 20.0,
-        "max": 300.0
+        "max": 300.0,
+        "n_numeric": 1614,
+        "mean": 204.9027,
+        "median": 200.0
       },
       "mode": "200 (1064 rows)",
       "full_counts": {
@@ -580,6 +756,13 @@
         "GTAA": 4,
         "GMAA": 4
       },
+      "n_categories": 10,
+      "category_count_stats": {
+        "min": 4,
+        "max": 1140,
+        "mean": 165.2,
+        "median": 29.0
+      },
       "note": "File codes differ slightly from doc: SAW-NG appears as NGSAW, GMA-NG as NGGMA; SAA (4 rows) is an undocumented variant of SA; ShMA and MMA both mean manual metal arc (keep separate or merge as modelling choice). ES listed in doc but absent from data. Heavily imbalanced toward MMA."
     }
   },
@@ -598,6 +781,8 @@
       "n_unique": 19,
       "min": 0.0,
       "max": 760.0,
+      "mean": 304.6742,
+      "median": 250.0,
       "note": "0.0 in 610 rows (as-welded); otherwise common plateaus at 250/14h, 580/2h, 690/1-24h, 750/2-8h. Jointly missing with col 30 on the same 13 rows."
     }
   },
@@ -616,6 +801,8 @@
       "n_unique": 21,
       "min": 0.0,
       "max": 24.0,
+      "mean": 5.0497,
+      "median": 2.0,
       "note": "0.0 in 610 rows (as-welded); pairs with col 29, e.g. (250,14), (580,2), (690,10)."
     }
   },
@@ -634,7 +821,18 @@
       "n_unique": 329,
       "n_reported": 780,
       "min": 315.0,
-      "max": 920.0
+      "max": 920.0,
+      "mean": 508.5572,
+      "median": 495.0,
+      "outliers": {
+        "high": {
+          "count": 1,
+          "values": [
+            920.0
+          ],
+          "note": "Single max 920 (gap 86 above 834) shares its row with the UTS max and elongation min (Evans-AlEl9Cr1Mo-1994-3Ni, 9Cr-3Ni weld) — internally consistent ultra-high-strength result, not a typo."
+        }
+      }
     }
   },
   "32": {
@@ -652,7 +850,18 @@
       "n_unique": 306,
       "n_reported": 738,
       "min": 447.0,
-      "max": 1151.0
+      "max": 1151.0,
+      "mean": 594.3863,
+      "median": 575.5,
+      "outliers": {
+        "high": {
+          "count": 1,
+          "values": [
+            1151.0
+          ],
+          "note": "Single max 1151 (gap 242 above 909), same 9Cr-3Ni row as the YS max — consistent, not a typo; check leverage."
+        }
+      }
     }
   },
   "33": {
@@ -670,7 +879,19 @@
       "n_unique": 135,
       "n_reported": 700,
       "min": 10.6,
-      "max": 37.0
+      "max": 37.0,
+      "mean": 26.2757,
+      "median": 26.8,
+      "outliers": {
+        "low": {
+          "count": 2,
+          "values": [
+            10.6,
+            11.0
+          ],
+          "note": "Minimum 10.6 sits on the same ultra-high-strength row (consistent: lowest ductility at highest strength). Low tail, not errors."
+        }
+      }
     }
   },
   "34": {
@@ -688,7 +909,18 @@
       "n_unique": 122,
       "n_reported": 705,
       "min": 17.0,
-      "max": 83.0
+      "max": 83.0,
+      "mean": 71.7999,
+      "median": 75.0,
+      "outliers": {
+        "low": {
+          "count": 1,
+          "values": [
+            17.0
+          ],
+          "note": "Single min 17.0 (Wolst-1974-N, gap 7 below next 24) — same 1974 source as other extremes; verify, do not silently drop."
+        }
+      }
     }
   },
   "35": {
@@ -707,7 +939,18 @@
       "n_reported": 879,
       "min": -114.0,
       "max": 188.0,
-      "note": "Jointly present/missing with col 36 (same 879 reported rows); modelling Charpy energy must condition on this temperature."
+      "mean": -34.6064,
+      "median": -40.0,
+      "note": "Jointly present/missing with col 36 (same 879 reported rows); modelling Charpy energy must condition on this temperature.",
+      "outliers": {
+        "high": {
+          "count": 1,
+          "values": [
+            188.0
+          ],
+          "note": "Single max 188 (gap 118 above next 70; Ditt-0.5rch2) with paired energy 141 J — plausible high-T test but isolated; verify (possible typo) and check leverage in temperature-conditioned models."
+        }
+      }
     }
   },
   "36": {
@@ -725,7 +968,18 @@
       "n_unique": 167,
       "n_reported": 879,
       "min": 3.0,
-      "max": 270.0
+      "max": 270.0,
+      "mean": 87.6894,
+      "median": 100.0,
+      "outliers": {
+        "high": {
+          "count": 1,
+          "values": [
+            270.0
+          ],
+          "note": "Single max 270 (gap 32 above 238; Chandel&-1985W3ch1). Mild — check leverage only."
+        }
+      }
     }
   },
   "37": {
@@ -745,7 +999,9 @@
       "plain_numeric": 80,
       "numeric_range": {
         "min": 154.0,
-        "max": 265.0
+        "max": 265.0,
+        "mean": 215.7,
+        "median": 221.0
       },
       "suffixed_tokens": 58,
       "suffix_breakdown": {
@@ -772,6 +1028,8 @@
       "n_reported": 31,
       "min": -126.0,
       "max": 30.0,
+      "mean": -31.0968,
+      "median": -15.0,
       "note": "Rarest target (31 values); unlikely to support supervised learning alone."
     }
   },
@@ -791,6 +1049,9 @@
       "n_reported": 98,
       "min": 0.0,
       "max": 48.0,
+      "n_numeric": 96,
+      "mean": 19.5521,
+      "median": 19.0,
       "censored_tokens": [
         "<1"
       ]
@@ -811,7 +1072,9 @@
       "n_unique": 46,
       "n_reported": 90,
       "min": 3.0,
-      "max": 100.0
+      "max": 100.0,
+      "mean": 25.9556,
+      "median": 18.0
     }
   },
   "41": {
@@ -829,7 +1092,9 @@
       "n_unique": 50,
       "n_reported": 90,
       "min": 0.0,
-      "max": 88.0
+      "max": 88.0,
+      "mean": 52.8333,
+      "median": 60.0
     }
   },
   "42": {
@@ -846,9 +1111,20 @@
     "observed": {
       "n_unique": 2,
       "n_reported": 89,
+      "mean": 0.3371,
+      "median": 0.0,
       "categories": {
         "0.0": 88,
         "30.0": 1
+      },
+      "outliers": {
+        "high": {
+          "count": 1,
+          "values": [
+            30.0
+          ],
+          "note": "Single nonzero among 89 reported (88 zeros; Evans-Ni/CMn-1990/1991-3.5Dawch) — the only observed martensite; verify, it carries any martensite signal alone."
+        }
       }
     }
   },
@@ -867,7 +1143,9 @@
       "n_unique": 8,
       "n_reported": 89,
       "min": 0.0,
-      "max": 8.0
+      "max": 8.0,
+      "mean": 0.4382,
+      "median": 0.0
     }
   },
   "44": {
