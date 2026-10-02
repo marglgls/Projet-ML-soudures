@@ -22,10 +22,10 @@ SCHEMA = REPO / 'context' / 'columns.json'
 OUT = REPO / 'data' / 'cleaned' / 'cleaned.csv'
 HEADER_RE = re.compile(r'^col(\d+)_(.+)$')
 # Columns ignored per the data_preprocessing.ipynb decision: targets too sparse
-# to predict (38-43: FATT, microstructure) + input features half-empty or more
-# (10, 11, 12, 17, 19, 20, 21). Intermediates still compute them; they are
-# excluded here at assembly time.
-DROPPED = {10, 11, 12, 17, 19, 20, 21, 38, 39, 40, 41, 42, 43}
+# to predict (37-43: hardness, FATT, microstructure) + input features half-empty
+# or more (10, 11, 12, 17, 19, 20, 21). Intermediates still compute them; they
+# are excluded here at assembly time.
+DROPPED = {10, 11, 12, 17, 19, 20, 21, 37, 38, 39, 40, 41, 42, 43}
 
 
 def main():
