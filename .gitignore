@@ -217,5 +217,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Data
-data/*
+# Data: ignore file contents, keep folder structure (via .gitkeep)
+data/welddb/*
+!data/welddb/.gitkeep
+data/intermediate/*
+!data/intermediate/.gitkeep
