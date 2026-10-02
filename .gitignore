@@ -222,3 +222,5 @@ data/welddb/*
 !data/welddb/.gitkeep
 data/intermediate/*
 !data/intermediate/.gitkeep
+data/cleaned/*
+!data/cleaned/.gitkeep
