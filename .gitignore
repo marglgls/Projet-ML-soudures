@@ -224,3 +224,17 @@ data/intermediate/*
 !data/intermediate/.gitkeep
 data/cleaned/*
 !data/cleaned/.gitkeep
+
+# LaTeX build files (report/): keep sources, ignore build output
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+report/*.pdf
+
+# Local exports of the data (Excel) and Office lock files
+data/*.xlsx
+~$*

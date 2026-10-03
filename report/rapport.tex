@@ -1,0 +1,56 @@
+% Rapport COMPLET du projet ML « Prédiction de qualité de soudures » : document de
+% travail de l'équipe, détaillé, sans limite de pages. Le rapport à rendre (~5 pages)
+% est rapport_final.tex, qui en est le résumé.
+%
+% Compiler depuis le dossier report/ :   latexmk -pdf rapport.tex
+%
+% \suivitrue  -> avec les encadrés « À faire » et les renvois « Où trouver » vers le code
+% \suivifalse -> sans ces encadrés
+%
+% Un fichier par section (sections/) pour limiter les conflits git :
+% chacun édite sa partie, ce fichier-ci change rarement.
+
+\documentclass[11pt,a4paper]{article}
+
+\newif\ifsuivi
+\suivitrue
+
+\input{preambule}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small Prédiction de qualité de soudures}
+\rhead{\small Rapport complet\ifsuivi\ --- \textcolor{BrickRed}{version de travail}\fi}
+\cfoot{\thepage}
+
+\begin{document}
+
+% ---------------------------------------------------------------- en-tête
+\begin{center}
+  {\LARGE\bfseries Prédiction de qualité de soudures}\\[6pt]
+  {\large Projet Machine Learning --- CentraleSupélec, 3A}\\[14pt]
+  Pablo Bosch \quad Myriam Boulaares \quad Salomé Fonvielle \quad Margaux Langlois\\[6pt]
+  \today
+\end{center}
+\thispagestyle{fancy}
+
+\begin{abstract}
+\noindent
+Nous prédisons la résistance, la ductilité et la ténacité de soudures d'acier à partir
+de leur composition, de leur procédé et de leur traitement thermique, sur une base
+publique de 1652 essais très incomplète et hétérogène. Ce rapport décrit le nettoyage
+des données, le protocole d'évaluation, puis compare plusieurs modèles.
+\end{abstract}
+
+\afaire{\item Mettre le résumé à jour avec les résultats principaux.}
+
+% Petite table des matières (sections et sous-sections)
+{\small\setcounter{tocdepth}{2}\tableofcontents}
+
+\input{sections/01_introduction}
+\input{sections/02_donnees}
+\input{sections/03_preprocessing}
+\input{sections/04_methodes}
+\input{sections/06_conclusion}
+
+\end{document}

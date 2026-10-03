@@ -21,6 +21,14 @@ RAW = REPO / 'data' / 'welddb' / 'welddb.data'
 SCHEMA = REPO / 'context' / 'columns.json'
 OUT = REPO / 'data' / 'intermediate' / 'decensored.csv'
 ID_COL = 44  # Weld ID, last column
+# Unit fixes for censored tokens reported in another unit than the column.
+# Col 9 (V, wt%): the 9 'EvansLetter...Mo' rows give '<5', like their ppm
+# columns (Ti, Al, B, Nb all '<5' on the same rows): it is 5 ppmw, not 5 wt%
+# (max V otherwise 0.32 wt%). 5 ppmw = 0.0005 wt%, the column's usual limit.
+# Cols 14 and 16 (Ti, Al, ppmw): the 16 'PantK-1990' rows give '<0.01', a wt%
+# limit (a 0.01 ppmw detection limit is unrealistic; Nb on the same rows is
+# 200-900 ppmw). 0.01 wt% = 100 ppmw, a limit already common in these columns.
+UNIT_FIX = {(9, '<5'): 0.0005, (14, '<0.01'): 100.0, (16, '<0.01'): 100.0}
 
 
 def concerned_columns(schema):
@@ -54,7 +62,7 @@ def build_table(repo=REPO):
         for num, header in cols:
             raw = r[num - 1]
             try:
-                val = decensor(raw)
+                val = UNIT_FIX.get((num, raw), None) or decensor(raw)
             except ValueError:
                 raise ValueError(f'unexpected token {raw!r} in column {num}')
             if raw.startswith('<'):
@@ -79,6 +87,8 @@ def main():
           ', '.join(f"col{n:02d}={counts[n]}" for n in sorted(counts)) +
           f' (total {total})')
     print(f'Wrote {OUT.relative_to(REPO)}: {len(table)} rows x {len(headers) + 1} columns')
+    for (num, raw), val in UNIT_FIX.items():
+        print(f'Unit fix: col{num:02d} {raw!r} -> {val!r} (limit given in another unit, see UNIT_FIX)')
     print('Examples (weld_id | column | raw -> new):')
     for wid, header, raw, val in examples:
         print(f'  {wid} | {header} | {raw} -> {val!r}')

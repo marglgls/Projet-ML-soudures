@@ -25,3 +25,23 @@ All-weld-metal deposit database by Tracey Cool and H. K. D. H. Bhadeshia (Phase 
 3. **Charpy energy is temperature-conditioned** — always model cols 35+36 jointly.
 4. **Duplicate/grouped IDs** — keep same-ID rows in the same fold; Weld ID encodes the literature source (Evans 700 rows, etc.), so group-by-source splits test generalisation best.
 5. **Class imbalance** in process (MMA-dominated) and current type (DC 1395 vs AC 42).
+
+## Preprocessing pipeline
+
+Data is git-ignored: download https://www.phase-trans.msm.cam.ac.uk/map/data/tar/welddb.tar and extract `welddb.data` into `data/welddb/`. Then run `data_preprocessing.ipynb` top to bottom (or the scripts below, from the repo root). Every decision is justified in the notebook.
+
+1. `preprocessing/decensor.py` — `<x` detection limits → `x` (unit fixes: V `<5` = 5 ppmw; Ti, Al `<0.01` = 0.01 wt% = 100 ppmw).
+2. `preprocessing/nitrogen_total.py` — `NNtotMMres` → total N `NN`.
+3. `preprocessing/interpass_range.py` — `150-200` → `175`.
+4. `preprocessing/categorical_clean.py` — AC/DC filled from polarity; weld process grouped into MMA, SA, TSA, FCA, GSA.
+4b. `preprocessing/heat_treatment.py` — 13 unknown heat treatments (`Gar&K-1975-25mm-*ht`) set to the same article's 600 °C / 0.75 h (assumption).
+5. `preprocessing/build_model_table.py` — joins `data/intermediate/*.csv` into `data/cleaned/cleaned.csv` (1652 × 30, sparse columns dropped).
+6. `preprocessing/ml_dataset.py` — modelling interface: `get_xy(df, target)` for `yield`, `uts`, `elongation`, `roa`, `charpy` (+ Charpy temperature as input), `source` CV groups, heat-treatment indicators (`as_welded`, `degassing_250C_14h`), and `make_preprocessor(X)` (median imputation + missing indicators, scaling, one-hot) to fit inside each CV fold:
+
+```python
+import sys; sys.path.insert(0, 'preprocessing')
+from ml_dataset import load_cleaned, get_xy, make_preprocessor
+X, y, groups = get_xy(load_cleaned(), 'yield')
+model = Pipeline([('prep', make_preprocessor(X)), ('reg', Ridge())])
+cross_val_score(model, X, y, groups=groups, cv=GroupKFold(5))
+```

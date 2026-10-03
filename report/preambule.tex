@@ -1,0 +1,43 @@
+% Préambule commun au rapport complet (rapport.tex) et au rapport final
+% (rapport_final.tex). Le fichier qui l'inclut doit définir \ifsuivi avant.
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage[hmargin=1.8cm, top=1.2cm, bottom=1cm, includehead, includefoot, headsep=8pt, footskip=16pt]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[section]{placeins} % les tableaux restent dans leur section
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{siunitx}
+\usepackage{fancyhdr}
+\usepackage[font=small, labelfont=bf]{caption}
+\usepackage[hidelinks]{hyperref}
+
+\sisetup{locale = FR}
+\graphicspath{{figures/}}
+\setlist{nosep, leftmargin=*}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\renewcommand{\arraystretch}{1.15}
+
+% Encadré de travail, visible seulement en version de suivi. Contenu : une liste
+% \item ... de ce qui reste à faire dans la section.
+\newcommand{\afaire}[1]{\ifsuivi\par\medskip\noindent
+  \fcolorbox{BrickRed}{BrickRed!6}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\small
+    \textcolor{BrickRed}{\textbf{À faire}}
+    \begin{itemize}#1\end{itemize}}}\par\medskip\fi}
+% Renvoi vers le code qui produit les chiffres d'une partie (version de suivi seulement).
+\newcommand{\outrouver}[1]{\ifsuivi\par\smallskip\noindent
+  {\small\sloppy\color{NavyBlue}\textbf{Où trouver :} #1\par}\smallskip\fi}
+% Nom de colonne / de fichier du dépôt.
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+% Autorise une coupure de ligne après / et - dans les noms longs (sans tiret ajouté).
+% Attention : les espaces sont ignorés ; pour un nom avec espace, utiliser \texttt.
+\renewcommand{\code}[1]{\texttt{\codecut#1\codeend}}
+\def\codeend{\codeend}
+\def\codecut#1{\ifx#1\codeend\else\ifx#1/\slash\else\ifx#1-\char`\-\allowbreak\else\detokenize{#1}\fi\fi\expandafter\codecut\fi}

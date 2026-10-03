@@ -1,0 +1,160 @@
+\section{Modélisation}\label{sec:methodes}
+
+\subsection{Protocole d'évaluation}\label{sec:protocole}
+
+Tous les modèles suivent le même protocole, pour être comparables.
+
+\subsubsection{Variables à prédire}\label{sec:qualite}
+
+\paragraph{Pourquoi ces grandeurs.} La base ne dit pas si une soudure est « bonne ».
+Nous mesurons sa qualité par les propriétés que vérifient les normes de soudage : la
+\emph{résistance} et la \emph{ductilité} (essai de traction), et la \emph{ténacité},
+résistance aux chocs (essai Charpy). L'absence de défauts ou la tenue en fatigue ne sont
+pas dans la base.
+
+\paragraph{Ce que les données en disent.}
+\begin{itemize}
+  \item Limite d'élasticité et résistance à la traction sont presque redondantes
+    (corrélation 0,93 sur 714 lignes).
+  \item La résistance s'oppose à la ductilité (corrélations de $-0{,}57$ à $-0{,}78$) :
+    une bonne soudure est un compromis.
+  \item Les lignes Charpy sont de deux types : 405 énergies mesurées, 474 fixées à
+    \SI{100}{\joule} ou \SI{28}{\joule} (section~\ref{sec:exploration}).
+\end{itemize}
+
+\begin{table}[!htbp]
+  \centering\small
+  \begin{tabular}{@{}l l c r r@{}}
+    \toprule
+    \textbf{Qualité} & \textbf{Grandeur} & \textbf{Unité} & \textbf{Lignes} & \textbf{Articles} \\
+    \midrule
+    Résistance & \textbf{limite d'élasticité} & \si{\mega\pascal} & 780 & 42 \\
+               & résistance à la traction     & \si{\mega\pascal} & 738 & 41 \\
+    Ductilité  & \textbf{allongement}         & \%                & 700 & 36 \\
+               & striction                    & \%                & 705 & 34 \\
+    Ténacité   & \textbf{énergie Charpy}      & \si{\joule}       & 879 & 26 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Grandeurs mesurant la qualité. En gras, les trois cibles principales.}
+  \label{tab:cibles}
+\end{table}
+
+\paragraph{Stratégie.}
+\begin{enumerate}
+  \item \textbf{Prédire chaque propriété} : une cible principale par qualité (en gras,
+    tableau~\ref{tab:cibles}), chacune avec son modèle de régression, entraîné sur les
+    lignes où elle est mesurée. Pour le Charpy, la température d'essai est une entrée ;
+    c'est une condition de mesure, pas un réglage : les recommandations seront données
+    pour une température d'essai fixée.
+  \item \textbf{Juger la qualité} : la soudure est bonne si chaque valeur prédite dépasse
+    son seuil.
+\end{enumerate}
+Un modèle direct « bonne / mauvaise » serait moins adapté : les seuils dépendent de
+l'usage, un oui/non perd de l'information (avec un seuil de \SI{47}{\joule},
+\SI{46}{\joule} et \SI{10}{\joule} seraient tous deux « mauvais »), et résistance et
+ténacité sont rarement mesurées sur la même ligne.
+
+Ce choix exclut les modèles de classification, pas les familles de modèles (arbres,
+forêts, plus proches voisins existent en régression). Son coût : la régression ne se
+concentre pas sur les erreurs proches du seuil. Une classification est donc testée en
+complément sur le Charpy, seule propriété avec un seuil commun à tous les aciers
+(\SI{27}{\joule} ou \SI{47}{\joule}) ; le seuil de résistance dépend de la classe d'acier
+(section~\ref{sec:modeles}).
+
+\outrouver{\code{TARGETS} et \code{get_xy} dans \code{preprocessing/ml_dataset.py} ;
+notebook, étape 6 et « Analyse descriptive › Liens entre les grandeurs à prédire ».}
+
+\afaire{\item Valider en équipe les trois cibles principales.
+  \item Trouver les seuils de « bonne soudure » et leurs sources (normes ISO 2560,
+    ISO 15614-1, AWS A5.1 à vérifier ; seuils Charpy usuels de \SI{27}{\joule} ou
+    \SI{47}{\joule} à une température donnée).}
+
+\subsubsection{Validation croisée}
+
+Un modèle est jugé sur des données qu'il n'a pas vues : la \emph{validation croisée}
+découpe les données en 5 parts, entraîne sur 4, teste sur la cinquième, cinq fois, puis
+moyenne les scores. Les lignes d'un même cordon ou d'un même article étant très proches,
+un découpage au hasard serait trop optimiste. Les lignes sont donc regroupées
+\textbf{par article} (\code{GroupKFold}) : le score mesure la capacité à prédire les
+soudures d'une étude inconnue.
+
+\outrouver{fonction \code{weld_source} dans \code{preprocessing/ml_dataset.py} ;
+vérification de l'absence de fuite : notebook, étape 6.}
+
+\afaire{\item Validation croisée imbriquée : un niveau extérieur (par article) pour mesurer
+    la performance, un niveau intérieur (par article) pour régler les hyperparamètres.
+  \item Ne pas utiliser l'erreur OOB des forêts : elle ignore les articles et serait trop
+    optimiste.}
+
+\subsubsection{Mesures d'erreur}
+
+\afaire{\item Justifier les mesures : RMSE et MAE, dans l'unité de la cible
+    (\si{\mega\pascal}, \%, \si{\joule}), et $R^2$ ; moyenne $\pm$ écart-type sur les plis.
+  \item Choix final par la règle de l'écart-type (cours 2) : parmi les modèles presque
+    aussi bons que le meilleur, garder le plus simple.
+  \item Coder le protocole commun (modèle + cible $\rightarrow$ scores), à faire en
+    premier --- \textbf{Salomé (proposé)}.}
+
+\subsection{Entraînement et évaluation des modèles}\label{sec:modeles}
+
+Chaque famille de modèles est appliquée aux trois cibles principales.
+
+\subsubsection{Modèles de référence et modèles linéaires}
+
+\afaire{\item Référence : prédire la moyenne (tout modèle doit faire mieux).
+  \item Régression linéaire, sélection de variables pas à pas, Ridge, Lasso ; lecture des
+    coefficients --- \textbf{Salomé (proposé)}.}
+
+\subsubsection{Réduction de dimension}
+
+\afaire{\item Régression sur les composantes de l'ACP et PLS ; nombre de composantes réglé
+    par validation croisée.
+  \item Charpy : modéliser les deux types de lignes ensemble ou séparément ? Tester les
+    deux --- \textbf{?}}
+
+\subsubsection{Arbres et méthodes d'ensemble}
+
+\afaire{\item Arbre CART, bagging, forêt aléatoire, extra-trees ; hyperparamètres
+    (profondeur, taille minimale des feuilles, nombre de variables tirées).
+  \item Importance des variables par permutation ; attention aux variables corrélées
+    (Cr, Mo, traitement), dont l'importance est surestimée --- \textbf{?}
+  \item Classification complémentaire « Charpy $\geq$ \SI{47}{\joule} à la température
+    d'essai ? » : comparer un arbre ou une forêt de classification au même modèle en
+    régression suivi du seuil, sur les mêmes plis.
+    \begin{itemize}
+      \item Seulement les 405 énergies mesurées (13 articles) : sur les lignes fixées,
+        l'étiquette est imposée par la convention (\SI{100}{\joule} toujours « bonne »,
+        \SI{28}{\joule} toujours « mauvaise »).
+      \item Classes déséquilibrées (69\,\% de « bonnes » à \SI{47}{\joule}, 84\,\% à
+        \SI{27}{\joule}) : précision équilibrée, F1, matrice de confusion.
+      \item Piste facultative : classes de résistance de la norme des électrodes
+        (ISO 2560, seuils à vérifier) pour la traction.
+    \end{itemize}}
+
+\subsubsection{Apprentissage semi-supervisé}
+
+\afaire{\item Bibliographie et au moins une méthode (auto-apprentissage, co-régression
+    COREG) exploitant les lignes où la cible n'est pas mesurée ; justifier son
+    intérêt --- \textbf{?}}
+
+\subsection{Conclusion de la modélisation}\label{sec:resultats}
+
+\afaire{\item Tableau comparatif des modèles par cible (moyenne $\pm$ écart-type sur les plis).
+  \item Figures prédit / réel.
+  \item Poids des indicateurs « valeur manquante » (section~\ref{sec:prep-manquantes}) :
+    comparer avec et sans.
+  \item Modèle retenu pour chaque cible et limites (peu d'articles, extrapolation).
+  \item Chacun présente sa famille de modèles aux autres avant le partiel.}
+
+% Gabarit de tableau à remplir
+% \begin{table}[!htbp]
+%   \centering\small
+%   \begin{tabular}{@{}lccc@{}}
+%     \toprule
+%     \textbf{Modèle} & \textbf{RMSE (MPa)} & \textbf{MAE (MPa)} & $\boldsymbol{R^2}$ \\
+%     \midrule
+%     Ridge  & & & \\
+%     \bottomrule
+%   \end{tabular}
+%   \caption{Limite d'élasticité, validation croisée groupée par article.}
+% \end{table}

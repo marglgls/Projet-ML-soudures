@@ -1,0 +1,213 @@
+\section{Données}\label{sec:donnees}
+
+La base \emph{MAP\_DATA\_WELD} (T.~Cool et H.~K.~D.~H.~Bhadeshia, Cambridge, 1996)
+rassemble des mesures tirées de nombreux articles sur le \emph{métal déposé}, le métal
+fondu qui forme le cordon de soudure. Elle compte \textbf{1652 lignes et 44 colonnes}.
+Une valeur absente est notée \code{N} : non rapportée, et non nulle.
+
+\outrouver{données brutes \code{data/welddb/welddb.data} (à télécharger, voir
+\code{README.md}) ; notebook \code{data_preprocessing.ipynb}, « Data Exploration ».}
+
+\subsection{Exploration}\label{sec:exploration}
+
+\subsubsection{Structure}
+
+Les colonnes 1 à 30, choisies avant ou pendant le soudage, sont les entrées. Les
+colonnes 31 à 43, résultats d'essais, sont les grandeurs à prédire
+(tableau~\ref{tab:colonnes}).
+
+\begin{table}[!htbp]
+  \centering\small
+  \begin{tabularx}{\linewidth}{@{}l c Y l@{}}
+    \toprule
+    \textbf{Groupe} & \textbf{Col.} & \textbf{Variables (unité)} & \textbf{Rôle} \\
+    \midrule
+    Composition       & 1--12  & C, Si, Mn, S, P, Ni, Cr, Mo, V, Cu, Co, W (\% massique) & entrée \\
+    Éléments mineurs  & 13--21 & O, Ti, N, Al, B, Nb, Sn, As, Sb (ppm massique) & entrée \\
+    Soudage           & 22--28 & courant (\si{\ampere}), tension (\si{\volt}), type de
+                                 courant AC/DC, polarité, énergie de soudage
+                                 (\si{\kilo\joule\per\milli\metre}), température entre
+                                 passes (\si{\celsius}), procédé & entrée \\
+    Traitement thermique & 29--30 & température (\si{\celsius}) et durée (\si{\hour}) ;
+                                 \code{0/0} = soudure brute & entrée \\
+    Propriétés mécaniques & 31--38 & limite d'élasticité, résistance à la traction
+                                 (\si{\mega\pascal}), allongement, striction (\%),
+                                 température et énergie Charpy (\si{\celsius},
+                                 \si{\joule}), dureté, FATT & sortie \\
+    Microstructure    & 39--43 & proportions de cinq structures cristallines (\%) & sortie \\
+    Identifiant       & 44     & \texttt{Weld ID}, qui indique aussi l'article d'origine & groupe \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Organisation des 44 colonnes de la base.}
+  \label{tab:colonnes}
+\end{table}
+
+\paragraph{Vocabulaire.}
+\begin{itemize}
+  \item \emph{ppm} : partie par million en masse (\SI{1}{ppm} = 0,0001\,\%).
+  \item \emph{Température entre passes} : température du métal quand on dépose une
+    nouvelle couche de soudure.
+  \item \emph{Traitement thermique} : réchauffage après soudage pour relâcher les
+    contraintes ; il modifie le métal.
+  \item \emph{Limite d'élasticité, résistance à la traction} : efforts à partir desquels
+    le métal se déforme pour de bon, puis casse.
+  \item \emph{Allongement, striction} : capacité à se déformer sans casser (ductilité).
+  \item \emph{Essai Charpy} : énergie absorbée par une éprouvette entaillée cassée d'un
+    coup de pendule ; plus elle est grande, moins le métal est fragile. Elle dépend
+    fortement de la température d'essai.
+\end{itemize}
+
+\paragraph{Une ligne correspond à un essai, pas à une soudure.} Plusieurs éprouvettes
+d'un même cordon sont testées différemment. Le cordon \code{Pat-1981-WB3/BX200} occupe
+ainsi cinq lignes : un essai de traction et quatre essais Charpy, de \SI{39}{\joule} à
+\SI{-60}{\celsius} à \SI{114}{\joule} à \SI{0}{\celsius}. On compte environ 620 cordons
+pour 1652 lignes. Nous gardons une ligne par essai pour conserver les températures d'essai
+et les traitements comme entrées. Les lignes d'un même cordon étant très proches, il
+faudra en tenir compte dans l'évaluation (section~\ref{sec:methodes}).
+
+\outrouver{\code{context/columns.json} ; notebook, « Analyses complémentaires › Une ligne
+correspond à un essai ».}
+
+\subsubsection{Valeurs manquantes}
+
+\paragraph{Dans les entrées.} De 0\,\% (carbone, manganèse) à 96\,\% (tungstène) de
+valeurs manquent selon les colonnes (figure~\ref{fig:manquants}) ; aucune ligne n'est
+complète. Ces absences dépendent de l'article : 21 des 46 articles ne donnent jamais le
+nickel, et les lignes sans nickel sont à 88\,\% des soudures manuelles, contre 49\,\%
+pour les autres. Les valeurs ne manquent donc pas au hasard (pas \emph{MCAR}) ; leur
+absence s'explique par l'article, connu (\emph{MAR}). Un nickel omis parce que très
+faible relèverait du \emph{MNAR}, possible mais invérifiable.
+
+\paragraph{Dans les résultats d'essais.} Chaque ligne ne contient qu'un essai : chaque
+grandeur n'est connue que sur une partie des lignes (environ 880 pour le Charpy, 700 à 780
+pour la traction). Ces cases sont structurellement vides, pas manquantes : l'essai n'a
+pas été fait sur cette éprouvette. Fusionner les lignes d'un même métal ne les remplirait
+pas sans perte, car un métal est souvent testé en Charpy à plusieurs températures : une
+seule ligne ne garderait qu'un de ces essais, ou leur moyenne, sans sens physique. Ces
+cases ne sont donc jamais complétées, et chaque modèle n'apprend que sur les articles qui
+ont fait son essai (26 sur 46 pour le Charpy). La dureté (138 lignes), la FATT (31) et la microstructure
+(environ 90) sont trop rares pour être apprises.
+
+\outrouver{notebook, « Analyses complémentaires › Valeurs manquantes des entrées » et
+« Lignes complètes ».}
+
+\subsubsection{Types de variables}
+
+\begin{itemize}
+  \item \textbf{Numériques} : composition, réglages de soudage, traitement et résultats
+    d'essais. Certaines valeurs sont écrites en texte (\code{<0.002}, \code{67tot33res},
+    \code{150-200}) et doivent être converties (section~\ref{sec:preprocessing}).
+  \item \textbf{Catégorielles nominales} : type de courant, polarité et procédé. Aucune
+    n'est ordinale : la polarité \code{0} ne se situe pas entre \code{+} et \code{-},
+    elle désigne le courant alternatif. Les catégories sont très déséquilibrées : soudage
+    manuel MMA sur 1140 lignes sur 1652, courant alternatif sur 42 seulement.
+\end{itemize}
+
+\outrouver{notebook, « Data Exploration » (valeurs non numériques, fréquences des
+catégories).}
+
+\subsubsection{Unités de mesure}
+
+La composition est donnée en \% pour les éléments principaux et en
+ppm pour les traces. Ce double usage est une source d'erreurs : des valeurs absurdes dans
+l'unité de leur colonne ont révélé des ppm notés en \%, et l'inverse
+(tableau~\ref{tab:decodage}). Une fois corrigé, il est sans effet sur les modèles après
+standardisation, mais une unité commune sera nécessaire pour les recommandations.
+
+\afaire{\item Piste à vérifier en bibliographie : l'effet d'un traitement thermique
+    dépend d'une combinaison de sa température (en kelvins) et du logarithme de sa durée
+    (paramètre de Hollomon-Jaffe). Créer cette variable pourrait aider les modèles.}
+
+\subsubsection{Distributions et valeurs extrêmes}
+
+\paragraph{Grandeurs à prédire.} Les propriétés de traction ont des distributions
+régulières (figure~\ref{fig:cibles}). Le Charpy présente deux pics : 356 lignes à
+exactement \SI{100}{\joule} et 118 à \SI{28}{\joule}. Certains articles, surtout ceux
+d'Evans, ne donnent que la température à laquelle la soudure atteint ces seuils :
+« \SI{-38}{\celsius}, \SI{100}{\joule} » signifie « \SI{100}{\joule} atteints à
+\SI{-38}{\celsius} ». Ce sont des points de la courbe énergie--température, calculés et
+non mesurés.
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\linewidth]{cibles}
+  \caption{Distribution des cinq grandeurs à prédire ($n$ : nombre de lignes où elle est
+    mesurée).}
+  \label{fig:cibles}
+\end{figure}
+
+\paragraph{Valeurs extrêmes.} La règle de l'IQR ne convient pas : 64\,\% des
+températures entre passes valent exactement \SI{200}{\celsius}, et elle déclarerait
+aberrantes toutes les autres. Nous avons donc examiné les valeurs extrêmes une à une.
+Ce sont presque toujours des mesures réelles, que nous gardons :
+\begin{itemize}
+  \item des séries volontaires (10 soudures très riches en soufre et en phosphore) ;
+  \item des soudures hors norme mais cohérentes (une soudure à 9\,\% de chrome a la plus
+    forte résistance et le plus faible allongement) ;
+  \item un effet de source (l'article le plus ancien, Wolst-1974, détient quatre valeurs
+    extrêmes).
+\end{itemize}
+
+\outrouver{revue détaillée : \code{preprocessing/outlier_*.py}, conclusions dans
+\code{context/columns.json} (champ \code{outliers}).}
+
+\subsubsection{Relations entre variables}
+
+\paragraph{Corrélations.} La figure~\ref{fig:correlations} donne la corrélation de
+Spearman (sur les rangs, donc peu sensible aux valeurs extrêmes) entre entrées et
+grandeurs à prédire. Elle indique un lien, pas une cause.
+\begin{itemize}
+  \item Les éléments d'alliage (Cr, Mo, V, Nb) vont avec plus de résistance et moins de
+    ductilité.
+  \item Les réglages de soudage (courant, tension, énergie) et les impuretés (S, P) vont
+    avec moins de striction.
+  \item Le Charpy n'est fortement lié à aucune entrée de composition ou de soudage ; sa
+    variable la plus liée est la température d'essai ($r = 0{,}46$).
+\end{itemize}
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=0.62\linewidth]{correlations}
+  \caption{Corrélation de Spearman entre entrées numériques et grandeurs à prédire. Les
+    valeurs $|r| \geq 0{,}4$ sont écrites.}
+  \label{fig:correlations}
+\end{figure}
+
+\paragraph{Analyse en composantes principales (ACP).} Appliquée aux 995 métaux distincts
+(un métal testé plusieurs fois compte une fois), après imputation par la médiane et
+standardisation (figure~\ref{fig:acp}) :
+\begin{itemize}
+  \item \textbf{les entrées ne sont pas redondantes} : deux axes n'expliquent que 38\,\%
+    de la variance ; nous les gardons toutes ;
+  \item \textbf{l'axe 1 (21\,\%) sépare aciers alliés et ordinaires} : les soudures
+    riches en Cr, Mo, V, N et Nb sont presque toujours traitées thermiquement (94\,\% de
+    celles à plus de 1\,\% de chrome), donc ces variables varient ensemble. On ne pourra
+    pas distinguer l'effet des alliages de celui du traitement ;
+  \item \textbf{l'axe 2 (17\,\%) correspond à la chaleur apportée par le soudage} : il
+    sépare l'arc submergé (\SI{640}{\ampere} médian) de l'arc manuel (\SI{170}{\ampere}).
+    Courant, tension et énergie de soudage varient ensemble, car l'énergie se calcule à
+    partir des deux autres et de la vitesse : leurs effets ne pourront pas être séparés.
+    Les recommandations porteront sur l'énergie, toujours renseignée et qui intègre la
+    vitesse.
+\end{itemize}
+Ces résultats restent les mêmes avec d'autres méthodes d'imputation. Les modèles devront
+couvrir des familles de soudures très différentes.
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\linewidth]{acp}
+  \caption{ACP des entrées numériques : (a) variance expliquée par composante,
+    (b) cercle des corrélations (flèches bleues : variables bien représentées), (c)
+    projection des 995 métaux, par famille de procédé.}
+  \label{fig:acp}
+\end{figure}
+
+\outrouver{notebook, « Analyse descriptive » (figures enregistrées dans
+\code{report/figures/}) et « Énergie de soudage, courant et tension ».}
+
+\afaire{\item Ajouter au notebook la comparaison des méthodes d'imputation avant l'ACP
+    (médiane, plus proches voisins, imputation itérative).
+  \item À décider en équipe : le traitement à \SI{250}{\celsius} / \SI{14}{\hour}
+    (333 lignes, surtout de traction) est-il un simple dégazage équivalent à « brut » ?
+  \item Recopier les résultats de traction sur les lignes Charpy du même état, utile
+    seulement si la qualité combine résistance et ténacité.}

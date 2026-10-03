@@ -1,0 +1,137 @@
+\subsection{Pré-traitement}\label{sec:preprocessing}
+
+Trois problèmes sont traités dans l'ordre : valeurs manquantes, valeurs non numériques,
+écarts d'échelle. Chaque étape est un script de \code{preprocessing/}, expliqué dans le
+notebook ; le fichier d'origine n'est jamais modifié.
+
+\subsubsection{Gestion des valeurs manquantes}\label{sec:prep-manquantes}
+
+\paragraph{Colonnes écartées.} Les sorties absentes d'au moins trois quarts des lignes
+(dureté, FATT, microstructure) et les entrées vides au moins une fois sur deux et
+secondaires (Cu, Co, W, B, Sn, As, Sb, surtout à l'état de traces). Ni, Cr, Mo et Nb,
+également vides à plus de 50\,\%, sont gardés : ce sont les principaux éléments
+d'alliage (figure~\ref{fig:manquants}).
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=0.82\linewidth]{manquants}
+  \caption{Part de valeurs manquantes pour chacune des 30 entrées. En gris, les entrées
+    écartées.}
+  \label{fig:manquants}
+\end{figure}
+
+\paragraph{Valeurs déduites.}
+\begin{itemize}
+  \item \emph{Type de courant} (manquant sur 215 lignes) : une polarité \code{+} ou
+    \code{-} implique le courant continu, \code{0} le courant alternatif ; 59 lignes
+    complétées.
+  \item \emph{Traitement thermique} (manquant sur 13 lignes notées « traitées » d'un
+    même article) : nous supposons le traitement des autres soudures de l'article,
+    \SI{600}{\celsius} pendant \SI{0,75}{\hour}.
+\end{itemize}
+
+\paragraph{Indicateurs de traitement.} Lue comme une quantité, la température ferait de
+\SI{250}{\celsius} un demi-revenu. Or le traitement à \SI{250}{\celsius} /
+\SI{14}{\hour} (333 lignes) est probablement un dégazage qui modifie peu le métal, alors
+qu'un revenu entre 550 et \SI{750}{\celsius} le transforme. Deux entrées 0/1, « soudure
+brute » (610 lignes) et « dégazage », permettent au modèle de traiter ces cas à part.
+
+\paragraph{Valeurs complétées.} Les autres valeurs manquantes des entrées sont remplacées
+par la médiane, avec pour chaque colonne un \emph{indicateur} 0/1 « valeur manquante » :
+l'absence renseigne sur l'article (section~\ref{sec:exploration}). Cet indicateur décrit
+la collecte des données, pas le métal (« nickel manquant » ne veut pas dire « sans
+nickel ») : il ne servira pas aux recommandations. Les résultats d'essais ne sont jamais
+complétés.
+
+\outrouver{colonnes écartées : liste \code{DROPPED} dans \code{build_model_table.py}
+(étape 5) ; type de courant : \code{categorical_clean.py} (étape 4) ; traitement inconnu :
+\code{heat_treatment.py} (étape 4b) ; indicateurs de traitement : \code{INDICATORS} dans
+\code{ml_dataset.py} ; imputation : \code{make_preprocessor} (étape 6).}
+
+\afaire{\item Vérifier dans l'article Gar\&K-1975 le traitement des soudures de
+    \SI{25}{\milli\metre} (supposé identique à celui des \SI{12}{\milli\metre}).
+  \item Comparer l'imputation par la médiane à une imputation qui tient compte des autres
+    colonnes (plus proches voisins, imputation itérative).}
+
+\subsubsection{Gestion des variables non numériques}
+
+\paragraph{Nombres écrits en texte.} Voir le tableau~\ref{tab:decodage}.
+
+\begin{table}[!htbp]
+  \centering\small
+  \begin{tabularx}{\linewidth}{@{}l l r Y@{}}
+    \toprule
+    \textbf{Codage} & \textbf{Col.} & \textbf{Valeurs} & \textbf{Règle et justification} \\
+    \midrule
+    \code{<x} (limite de détection) & 14 col. & 1576 & $x$. La vraie valeur est entre 0
+                                                       et $x$. Autre choix possible : $x/2$. \\
+    V \code{<5}                     & 9       & 9    & 0,0005\,\%. C'est 5\,ppm : ailleurs,
+                                                       V ne dépasse jamais 0,32\,\%. \\
+    Ti, Al \code{<0.01}             & 14, 16  & 32   & \SI{100}{ppm}. C'est 0,01\,\% :
+                                                       0,01\,ppm serait irréaliste. \\
+    \code{67tot33res} (azote)       & 15      & 59   & 67. On garde l'azote total, comme
+                                                       sur les autres lignes. \\
+    \code{150-200} (entre passes)   & 27      & 38   & \SI{175}{\celsius}, le milieu de
+                                                       l'intervalle. \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Conversion des nombres écrits sous forme de texte.}
+  \label{tab:decodage}
+\end{table}
+
+\paragraph{Variables catégorielles.} Type de courant, polarité et procédé sont convertis
+par \emph{encodage one-hot} (une colonne 0/1 par catégorie) : étant nominales, un
+encodage ordinal (0, 1, 2\ldots) leur imposerait un ordre qui n'existe pas. Les 10 codes de procédé sont
+d'abord regroupés en 5 familles selon la protection du métal fondu (enrobage, flux en
+poudre, fil fourré ou gaz), principale différence entre procédés à l'arc
+(tableau~\ref{tab:procedes}). Cela fusionne les synonymes (ShMA et MMA) et les codes de 4
+à 7 lignes, trop rares pour être appris ; la famille sous gaz reste hétérogène.
+
+\begin{table}[!htbp]
+  \centering\small
+  \begin{tabular}{@{}l l r@{}}
+    \toprule
+    \textbf{Famille} & \textbf{Codes d'origine (lignes)} & \textbf{Lignes} \\
+    \midrule
+    MMA (arc manuel, électrode enrobée) & MMA (1140), ShMA (40, même procédé) & 1180 \\
+    SA (arc submergé sous flux)         & SA (261), NGSAW (18), SAA (4)       & 283 \\
+    TSA (arc submergé, deux fils)       & TSA (87)                            & 87 \\
+    FCA (fil fourré)                    & FCA (87)                            & 87 \\
+    GSA (arc sous protection gazeuse)   & NGGMA (7), GMAA (4), GTAA (4)       & 15 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Regroupement des procédés de soudage en cinq familles.}
+  \label{tab:procedes}
+\end{table}
+
+\outrouver{\code{decensor.py} (étape 1), \code{nitrogen_total.py} (étape 2),
+\code{interpass_range.py} (étape 3), \code{categorical_clean.py} (étape 4) ; encodage :
+\code{make_preprocessor} dans \code{ml_dataset.py} (étape 6).}
+
+\afaire{\item Tests de sensibilité : \code{<x} $\rightarrow x$ ou $x/2$ ; azote total ou
+    total + résiduel.}
+
+\subsubsection{Mise à l'échelle}
+
+Le carbone varie entre 0,03 et 0,18\,\%, le courant entre 115 et \SI{900}{\ampere}. Nous
+\emph{standardisons} toutes les variables numériques (moyenne 0, écart-type 1) :
+\begin{itemize}
+  \item \textbf{nécessaire} pour les modèles sensibles à l'échelle : Ridge, Lasso, ACP,
+    PLS, plus proches voisins, SVR, réseaux de neurones ;
+  \item \textbf{sans effet} sur les prédictions des autres : régression linéaire simple,
+    arbres et forêts (un arbre coupe au même endroit quelle que soit l'unité).
+\end{itemize}
+Tous les modèles reçoivent ainsi la même préparation. Limites : la standardisation est
+sensible aux valeurs extrêmes et ne corrige pas l'asymétrie ; une mise à l'échelle
+robuste ou une transformation logarithmique seront comparées.
+
+\paragraph{Éviter la fuite d'information.} Imputation, encodage et standardisation
+utilisent des statistiques des données (médiane, moyenne\ldots). Calculées sur toute la
+base, elles feraient profiter l'entraînement des données de test et rendraient les
+résultats trop optimistes. Un \code{Pipeline} scikit-learn les recalcule sur les seules
+données d'entraînement, à chaque étape de l'évaluation.
+
+\outrouver{\code{make_preprocessor} dans \code{preprocessing/ml_dataset.py} (étape 6).}
+
+\afaire{\item Transformations des variables asymétriques (log1p, mise à l'échelle robuste).
+  \item Vérifier la température Charpy de \SI{188}{\celsius} (\code{Ditt-0.5rch2}).}

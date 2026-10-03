@@ -1,0 +1,47 @@
+% Rapport FINAL à rendre (~5 pages) : résumé du rapport complet (rapport.tex).
+% Le détail, les justifications et les renvois vers le code sont dans rapport.tex ;
+% ici, seulement l'essentiel, avec renvoi au dépôt pour le reste.
+%
+% Compiler depuis le dossier report/ :   latexmk -pdf rapport_final.tex
+%
+% Les figures sont partagées avec le rapport complet (figures/). Sections : sections_final/.
+
+\documentclass[11pt,a4paper]{article}
+
+\newif\ifsuivi
+\suivifalse  % pas d'encadrés de travail dans le rapport rendu
+
+\input{preambule}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small Prédiction de qualité de soudures}
+\rhead{\small Équipe \numequipe}
+\cfoot{\thepage}
+
+\newcommand{\numequipe}{??} % TODO numéro d'équipe
+
+\begin{document}
+
+% ---------------------------------------------------------------- page de titre
+% Le sujet demande : noms, numéro d'équipe, date, mails et titre en première page.
+\begin{center}
+  {\LARGE\bfseries Prédiction de qualité de soudures}\\[6pt]
+  {\large Projet Machine Learning --- CentraleSupélec, 3A}\\[14pt]
+  \begin{tabular}{c@{\hspace{2.5em}}c}
+    Pablo Bosch & Myriam Boulaares \\
+    \footnotesize\texttt{?} & \footnotesize\texttt{myriam.boulaares@student-cs.fr} \\[6pt]
+    Salomé Fonvielle & Margaux Langlois \\
+    \footnotesize\texttt{salome.fonvielle@gmail.com} & \footnotesize\texttt{?}
+  \end{tabular}\par\vspace{8pt}
+  Équipe n\textsuperscript{o}~\numequipe \quad --- \quad \today
+\end{center}
+\thispagestyle{fancy}
+
+\input{sections_final/01_introduction}
+\input{sections_final/02_donnees}
+\input{sections_final/03_methodes}
+\input{sections_final/04_resultats}
+\input{sections_final/05_conclusion}
+
+\end{document}
