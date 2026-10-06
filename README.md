@@ -28,7 +28,7 @@ All-weld-metal deposit database by Tracey Cool and H. K. D. H. Bhadeshia (Phase 
 
 ## Preprocessing pipeline
 
-Data is git-ignored: download https://www.phase-trans.msm.cam.ac.uk/map/data/tar/welddb.tar and extract `welddb.data` into `data/welddb/`. Then run `data_preprocessing.ipynb` top to bottom (or the scripts below, from the repo root). Every decision is justified in the notebook.
+Data is git-ignored. Run `data_preprocessing.ipynb` top to bottom (or the scripts below, from the repo root). It will start by downloading https://www.phase-trans.msm.cam.ac.uk/map/data/tar/welddb.tar and extracting `welddb.data` into `data/welddb/`. Every decision is justified in the notebook.
 
 1. `preprocessing/decensor.py` — `<x` detection limits → `x` (unit fixes: V `<5` = 5 ppmw; Ti, Al `<0.01` = 0.01 wt% = 100 ppmw).
 2. `preprocessing/nitrogen_total.py` — `NNtotMMres` → total N `NN`.
