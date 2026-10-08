@@ -37,7 +37,7 @@ Data is git-ignored. Run `data_preprocessing.ipynb` top to bottom (or the script
 4b. `preprocessing/heat_treatment.py` — 13 unknown heat treatments (`Gar&K-1975-25mm-*ht`) set to the same article's 600 °C / 0.75 h (assumption).
 5. `preprocessing/build_model_table.py` — joins `data/intermediate/*.csv` into `data/cleaned/cleaned.csv` (1652 × 30, sparse columns dropped).
 5b. `preprocessing/alloy_zero.py` (called by step 5) — Ni, Cr, Mo, V, Nb never reported by an article (empty on all its rows) → 0: a reporting choice meaning "not alloyed", not a missing measurement. Applied article by article, before any merge of articles. Isolated gaps, O, N, Ti, Al and welding parameters stay missing (median imputation in each CV fold).
-6. `preprocessing/ml_dataset.py` — modelling interface: `get_xy(df, target)` for `yield`, `uts`, `elongation`, `roa`, `charpy` (+ Charpy temperature as input), `source` CV groups, heat-treatment indicators (`as_welded`, `degassing_250C_14h`), and `make_preprocessor(X)` (median imputation + missing indicators, scaling, one-hot) to fit inside each CV fold:
+6. `preprocessing/ml_dataset.py` — modelling interface: `get_xy(df, target)` for `yield`, `uts`, `elongation`, `roa`, `charpy` (+ Charpy temperature as input; rows reporting the target, duplicate inputs merged into one row with the mean target and the first row's article), `source` CV groups, heat-treatment indicators (`as_welded`, `degassing_250C_14h`), and `make_preprocessor(X)` (median imputation + missing indicators, scaling, one-hot) to fit inside each CV fold:
 
 ```python
 import sys; sys.path.insert(0, 'preprocessing')

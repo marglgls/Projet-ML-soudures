@@ -11,6 +11,8 @@ This module also defines:
   - the targets (one model per target, trained on the rows reporting it);
     Charpy energy is temperature-conditioned, so the Charpy test temperature
     (col 35) is added as an input for that target only;
+  - the merge of duplicate inputs (see get_xy): rows with exactly the same
+    inputs become one row (mean target, article of the first row);
   - the inputs: cols 1-30 kept by build_model_table.py (composition, welding
     parameters, PWHT) + two 0/1 heat-treatment indicators (INDICATORS). Other
     outputs are never used as inputs;
@@ -99,11 +101,26 @@ def input_columns(df):
 
 def get_xy(df, target):
     """X, y, groups for one target ('yield', 'uts', 'elongation', 'roa',
-    'charpy'), restricted to the rows where that target is reported."""
+    'charpy'), in two steps:
+
+    1. keep the rows where the target is reported;
+    2. merge duplicate inputs: rows with exactly the same inputs (same recipe,
+       plus the same test temperature for Charpy) are repeated measurements
+       of one recipe. They become ONE row: target = mean of the measurements,
+       group = article of the first row. Two empty cells count as equal.
+
+    Called on the whole base, before the CV split. No leakage: each mean only
+    uses the measurements of its own recipe, and the merged row then goes
+    entirely to train or to test (without the merge, two replicates could be
+    split between train and test).
+    """
     y_col = TARGETS[target]
     rows = df[df[y_col].notna()]
     x_cols = input_columns(df) + ([CHARPY_T] if target == 'charpy' else [])
-    return rows[x_cols], rows[y_col], rows['source']
+    merged = (rows.groupby(x_cols, dropna=False, sort=False)
+                  .agg({y_col: 'mean', 'source': 'first'})
+                  .reset_index())
+    return merged[x_cols], merged[y_col], merged['source']
 
 
 def make_preprocessor(X, impute='median'):
@@ -138,7 +155,7 @@ def main():
     for target, y_col in TARGETS.items():
         X, y, groups = get_xy(df, target)
         Xt = make_preprocessor(X).fit_transform(X)
-        print(f'  {target:<10} {y_col:<34} n={len(y):>4}  sources={groups.nunique():>2}  '
+        print(f'  {target:<10} {y_col:<34} n={len(y):>4} (from {int(df[y_col].notna().sum()):>4} rows)  sources={groups.nunique():>2}  '
               f'X after preprocessing: {Xt.shape[1]} features, NaN left: {int(pd.isna(Xt).sum())}')
 
 
