@@ -8,12 +8,17 @@ the data_preprocessing.ipynb decision) are excluded. A column covered twice is
 an error. Rows are joined positionally (1652 rows, weld_id order checked
 identical everywhere — weld IDs are not unique so no key-join).
 
+Step 5b (alloy_zero.py) is applied to the assembled table before writing:
+Ni, Cr, Mo, V, Nb never reported by an article -> 0.
+
 Run from the repo root:  python3 preprocessing/build_model_table.py
 """
 import csv
 import json
 import re
 from pathlib import Path
+
+from alloy_zero import fill_zero, report
 
 REPO = Path.cwd()
 INTER = REPO / 'data' / 'intermediate'
@@ -62,19 +67,25 @@ def main():
     kept = [n for n in ORDER if n not in DROPPED]
     out_headers = ['weld_id'] + [schema_headers[n] for n in kept]
     provenance = {}
+    table = []
+    for i, wid in enumerate(order):
+        row = [wid]
+        for n in kept:
+            if n in covered:
+                row.append(covered[n][1][i])
+            else:
+                tok = raw[i][n - 1]
+                row.append('' if tok == 'N' else tok)
+        table.append(row)
+
+    # Step 5b: alloying elements never reported by an article -> 0 (alloy_zero.py)
+    filled = fill_zero(out_headers, table)
+
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT, 'w', newline='', encoding='utf-8') as f:
         w = csv.writer(f)
         w.writerow(out_headers)
-        for i, wid in enumerate(order):
-            row = [wid]
-            for n in kept:
-                if n in covered:
-                    row.append(covered[n][1][i])
-                else:
-                    tok = raw[i][n - 1]
-                    row.append('' if tok == 'N' else tok)
-            w.writerow(row)
+        w.writerows(table)
     for n in range(1, 44):
         if n not in DROPPED:
             provenance[n] = covered[n][0] if n in covered else 'raw'
@@ -85,6 +96,7 @@ def main():
         print(f'  {src}: {c} columns {cols}')
     print(f'Wrote {OUT.relative_to(REPO)}: 1652 rows x {len(out_headers)} columns')
     print(f'Dropped per notebook decision ({len(DROPPED)}): {sorted(DROPPED)}')
+    report(filled)
 
 
 if __name__ == '__main__':
