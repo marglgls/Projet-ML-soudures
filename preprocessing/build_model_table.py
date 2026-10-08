@@ -26,6 +26,9 @@ HEADER_RE = re.compile(r'^col(\d+)_(.+)$')
 # or more (10, 11, 12, 17, 19, 20, 21). Intermediates still compute them; they
 # are excluded here at assembly time.
 DROPPED = {10, 11, 12, 17, 19, 20, 21, 37, 38, 39, 40, 41, 42, 43}
+# Output column order: the inputs (1-30), then the Charpy test temperature (35),
+# a test condition used as an input of the Charpy model, then the outputs.
+ORDER = list(range(1, 31)) + [35] + [n for n in range(31, 44) if n != 35]
 
 
 def main():
@@ -56,8 +59,8 @@ def main():
             covered[num] = (path.name, [r[header] for r in recs])
     assert raw_ids == order, 'intermediate row order differs from raw file'
 
-    out_headers = ['weld_id'] + [schema_headers[n] for n in range(1, 44)
-                                 if n not in DROPPED]
+    kept = [n for n in ORDER if n not in DROPPED]
+    out_headers = ['weld_id'] + [schema_headers[n] for n in kept]
     provenance = {}
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT, 'w', newline='', encoding='utf-8') as f:
@@ -65,9 +68,7 @@ def main():
         w.writerow(out_headers)
         for i, wid in enumerate(order):
             row = [wid]
-            for n in range(1, 44):
-                if n in DROPPED:
-                    continue
+            for n in kept:
                 if n in covered:
                     row.append(covered[n][1][i])
                 else:
