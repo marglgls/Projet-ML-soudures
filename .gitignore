@@ -238,3 +238,6 @@ report/*.pdf
 # Local exports of the data (Excel) and Office lock files
 data/*.xlsx
 ~$*
+
+# Cache des calculs du notebook modeles.ipynb
+cache_modeles/
