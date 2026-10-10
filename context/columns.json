@@ -948,7 +948,7 @@
           "values": [
             188.0
           ],
-          "note": "Single max 188 (gap 118 above next 70; Ditt-0.5rch2) with paired energy 141 J — plausible high-T test but isolated; verify (possible typo) and check leverage in temperature-conditioned models."
+          "note": "Single max 188 (gap 118 above next 70; Ditt-0.5rch2) with paired energy 141 J — plausible high-T test but isolated; almost certainly a typo for -10 (the 4 other Ditt welds are tested at 20/-10/-30, this one at 20/188/-30): test removed in build_model_table.py (BAD_CHARPY)."
         }
       }
     }

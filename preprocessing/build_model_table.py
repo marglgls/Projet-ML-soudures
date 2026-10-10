@@ -11,6 +11,9 @@ identical everywhere — weld IDs are not unique so no key-join).
 Step 5b (alloy_zero.py) is applied to the assembled table before writing:
 Ni, Cr, Mo, V, Nb never reported by an article -> 0.
 
+Charpy tests in BAD_CHARPY are emptied (temperature and energy) before writing:
+the row then reports no test result and is used by no model.
+
 Run from the repo root:  python3 preprocessing/build_model_table.py
 """
 import csv
@@ -34,6 +37,12 @@ DROPPED = {10, 11, 12, 17, 19, 20, 21, 37, 38, 39, 40, 41, 42, 43}
 # Output column order: the inputs (1-30), then the Charpy test temperature (35),
 # a test condition used as an input of the Charpy model, then the outputs.
 ORDER = list(range(1, 31)) + [35] + [n for n in range(31, 44) if n != 35]
+# Charpy tests removed as data-entry errors (temperature col 35 and energy col 36
+# emptied). Ditt-0.5rch2: 188 degC, the only Charpy temperature above 70 degC;
+# the 4 other welds of the article are all tested at 20, -10 and -30 degC, and
+# this weld at 20, 188 and -30 degC: almost certainly a typo for -10 degC.
+BAD_CHARPY = {'Ditt-0.5rch2'}
+CHARPY_COLS = ('col35_Charpy_temperature', 'col36_Charpy_impact_toughness')
 
 
 def main():
@@ -81,6 +90,13 @@ def main():
     # Step 5b: alloying elements never reported by an article -> 0 (alloy_zero.py)
     filled = fill_zero(out_headers, table)
 
+    # Charpy tests removed as data-entry errors (BAD_CHARPY)
+    removed = [row for row in table if row[0] in BAD_CHARPY]
+    assert len(removed) == len(BAD_CHARPY), 'BAD_CHARPY weld not found'
+    for row in removed:
+        for h in CHARPY_COLS:
+            row[out_headers.index(h)] = ''
+
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT, 'w', newline='', encoding='utf-8') as f:
         w = csv.writer(f)
@@ -97,6 +113,7 @@ def main():
     print(f'Wrote {OUT.relative_to(REPO)}: 1652 rows x {len(out_headers)} columns')
     print(f'Dropped per notebook decision ({len(DROPPED)}): {sorted(DROPPED)}')
     report(filled)
+    print(f'Charpy tests removed as data-entry errors: {sorted(BAD_CHARPY)}')
 
 
 if __name__ == '__main__':
