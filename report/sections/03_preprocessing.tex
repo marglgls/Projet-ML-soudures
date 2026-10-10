@@ -1,16 +1,14 @@
 \subsection{Pré-traitement}\label{sec:preprocessing}
 
-Trois problèmes sont traités dans l'ordre : valeurs manquantes, valeurs non numériques,
-écarts d'échelle. Chaque étape est un script de \code{preprocessing/}, expliqué dans le
+Quatre problèmes sont traités dans l'ordre : valeurs manquantes, valeurs non numériques,
+écarts d'échelle, mesures répétées. Chaque étape est un script de \code{preprocessing/}, expliqué dans le
 notebook ; le fichier d'origine n'est jamais modifié.
 
 \subsubsection{Gestion des valeurs manquantes}\label{sec:prep-manquantes}
 
-\paragraph{Colonnes écartées.} Les sorties absentes d'au moins trois quarts des lignes
-(dureté, FATT, microstructure) et les entrées vides au moins une fois sur deux et
-secondaires (Cu, Co, W, B, Sn, As, Sb, surtout à l'état de traces). Ni, Cr, Mo et Nb,
-également vides à plus de 50\,\%, sont gardés : ce sont les principaux éléments
-d'alliage (figure~\ref{fig:manquants}).
+La figure~\ref{fig:manquants} donne la part de valeurs manquantes de chaque entrée.
+Selon la colonne et la raison de l'absence (section~\ref{sec:exploration}), une case vide
+est écartée, mise à 0, déduite des autres colonnes ou complétée par la médiane.
 
 \begin{figure}[!htbp]
   \centering
@@ -19,6 +17,60 @@ d'alliage (figure~\ref{fig:manquants}).
     écartées.}
   \label{fig:manquants}
 \end{figure}
+
+\paragraph{Colonnes écartées.} Les sorties absentes d'au moins trois quarts des lignes
+(dureté, FATT, microstructure) sont écartées : trop rares pour être apprises. Côté
+entrées, sept éléments chimiques vides au moins une fois sur deux sont écartés, pour l'une
+de deux raisons :
+\begin{itemize}
+  \item \textbf{trop peu de valeurs pour deviner les manquantes.} Sn, As et Sb sont des
+    impuretés, toujours présentes à quelques dizaines de ppm : une case vide ne vaut pas 0,
+    il faudrait donc la deviner. Avec plus de 80\,\% de cases vides, la colonne serait
+    presque entièrement inventée ;
+  \item \textbf{supposer 0 laisserait une colonne presque constante.} Co et W sont des
+    ajouts volontaires : une case vide vaut 0. Mais un seul article en contient vraiment ;
+    la colonne vaudrait 0 presque partout, et le modèle ne pourrait rien apprendre de son
+    effet, surtout quand cet article est mis de côté en validation croisée.
+\end{itemize}
+Cu et B sont un cas limite : ajoutés volontairement dans quelques articles, ils pourraient
+être gardés et mis à 0 comme ci-dessous. À l'inverse, Ni, Cr, Mo et Nb, bien que vides à
+plus de 50\,\%, sont gardés : leurs cases vides valent 0 (paragraphe suivant), et ils ont
+une teneur significative dans 13 à 23 articles, assez pour que le modèle apprenne leur
+effet.
+
+\paragraph{Éléments d'alliage jamais rapportés.} Ni, Cr, Mo, V et Nb sont des
+additions volontaires. Quand un article ne donne \emph{jamais} l'un d'eux (vide sur toutes
+ses lignes), c'est un choix de l'article et non un oubli : ses soudures ne sont pas
+alliées avec cet élément, qui n'y est qu'à l'état résiduel. Les données le confirment :
+les soudures C-Mn qui rapportent ces éléments en contiennent très peu (Ni et Cr : médiane
+0\,\%, 90\,\% des valeurs $\leq 0{,}08$\,\%), bien moins que les médianes de la base
+(Cr 0,53\,\%, Mo 0,34\,\%). Compléter par la médiane inventerait un acier allié. Ces
+cases sont donc mises à \textbf{0}, sans indicateur « valeur manquante » (décision
+d'équipe ; tableau~\ref{tab:alliage-zero}).
+
+\begin{table}[!htbp]
+  \centering\small
+  \begin{tabular}{@{}l r r r r@{}}
+    \toprule
+    \textbf{Élément} & \textbf{Manquants} & \textbf{Mis à 0} & \textbf{Articles} &
+    \textbf{Restants (isolés)} \\
+    \midrule
+    Ni & 955 & 949 & 21 & 6  \\
+    Cr & 868 & 862 & 18 & 6  \\
+    Mo & 859 & 856 & 19 & 3  \\
+    V  & 724 & 713 & 21 & 11 \\
+    Nb & 900 & 898 & 26 & 2  \\
+    \bottomrule
+  \end{tabular}
+  \caption{Éléments d'alliage jamais rapportés par un article, mis à 0 (4278 cases).}
+  \label{tab:alliage-zero}
+\end{table}
+
+La règle est appliquée article par article (article tiré de l'identifiant de la soudure,
+variantes d'écriture regroupées), avant toute fusion d'articles qui partagent une soudure.
+Elle ne concerne ni les trous isolés (l'article donne l'élément sur d'autres lignes), ni
+O et N (toujours présents dans le métal fondu), ni Ti et Al (désoxydants), ni les
+réglages de soudage : là, une absence ne veut pas dire zéro.
 
 \paragraph{Valeurs déduites.}
 \begin{itemize}
@@ -30,12 +82,6 @@ d'alliage (figure~\ref{fig:manquants}).
     \SI{600}{\celsius} pendant \SI{0,75}{\hour}.
 \end{itemize}
 
-\paragraph{Indicateurs de traitement.} Lue comme une quantité, la température ferait de
-\SI{250}{\celsius} un demi-revenu. Or le traitement à \SI{250}{\celsius} /
-\SI{14}{\hour} (333 lignes) est probablement un dégazage qui modifie peu le métal, alors
-qu'un revenu entre 550 et \SI{750}{\celsius} le transforme. Deux entrées 0/1, « soudure
-brute » (610 lignes) et « dégazage », permettent au modèle de traiter ces cas à part.
-
 \paragraph{Valeurs complétées.} Les autres valeurs manquantes des entrées sont remplacées
 par la médiane, avec pour chaque colonne un \emph{indicateur} 0/1 « valeur manquante » :
 l'absence renseigne sur l'article (section~\ref{sec:exploration}). Cet indicateur décrit
@@ -44,14 +90,11 @@ nickel ») : il ne servira pas aux recommandations. Les résultats d'essais ne s
 complétés.
 
 \outrouver{colonnes écartées : liste \code{DROPPED} dans \code{build_model_table.py}
-(étape 5) ; type de courant : \code{categorical_clean.py} (étape 4) ; traitement inconnu :
-\code{heat_treatment.py} (étape 4b) ; indicateurs de traitement : \code{INDICATORS} dans
-\code{ml_dataset.py} ; imputation : \code{make_preprocessor} (étape 6).}
+(étape 5) ; éléments d'alliage mis à 0 : \code{alloy_zero.py} (étape 5b, appelée par
+\code{build_model_table.py}) ; type de courant : \code{categorical_clean.py} (étape 4) ;
+traitement inconnu : \code{heat_treatment.py} (étape 4b) ; notebook, parties 3 et 4 ; imputation :
+\code{make_preprocessor} dans \code{ml_dataset.py} (étape 6).}
 
-\afaire{\item Vérifier dans l'article Gar\&K-1975 le traitement des soudures de
-    \SI{25}{\milli\metre} (supposé identique à celui des \SI{12}{\milli\metre}).
-  \item Comparer l'imputation par la médiane à une imputation qui tient compte des autres
-    colonnes (plus proches voisins, imputation itérative).}
 
 \subsubsection{Gestion des variables non numériques}
 
@@ -79,13 +122,22 @@ complétés.
   \label{tab:decodage}
 \end{table}
 
-\paragraph{Variables catégorielles.} Type de courant, polarité et procédé sont convertis
-par \emph{encodage one-hot} (une colonne 0/1 par catégorie) : étant nominales, un
-encodage ordinal (0, 1, 2\ldots) leur imposerait un ordre qui n'existe pas. Les 10 codes de procédé sont
-d'abord regroupés en 5 familles selon la protection du métal fondu (enrobage, flux en
-poudre, fil fourré ou gaz), principale différence entre procédés à l'arc
-(tableau~\ref{tab:procedes}). Cela fusionne les synonymes (ShMA et MMA) et les codes de 4
-à 7 lignes, trop rares pour être appris ; la famille sous gaz reste hétérogène.
+\paragraph{Variables catégorielles.} Type de courant (AC ou DC), polarité (\code{+},
+\code{-} ou \code{0}) et procédé de soudage sont des étiquettes, sans ordre entre elles
+(variables \emph{nominales}). Les numéroter (MMA = 0, SA = 1, FCA = 2\ldots) ferait
+croire au modèle que SA se situe entre MMA et FCA. Nous utilisons donc un
+\emph{encodage one-hot} : une colonne 0/1 par catégorie, qui répond à une question du
+type « est-ce une soudure MMA ? ».
+
+Les 10 codes de procédé sont d'abord regroupés en 5 familles
+(tableau~\ref{tab:procedes}), pour deux raisons : certains codes sont des synonymes
+(ShMA et MMA désignent le même procédé), et d'autres n'ont que 4 à 7 lignes, trop peu
+pour qu'une colonne 0/1 soit apprise. Le regroupement suit la façon dont le métal fondu
+est protégé de l'air, principale différence entre procédés à l'arc : enrobage de
+l'électrode (MMA), flux en poudre (SA), fil fourré (FCA) ou gaz (GSA). L'arc submergé à
+deux fils (TSA) a la même protection que SA, mais il est gardé à part car il apporte
+beaucoup plus de chaleur. La famille sous gaz reste hétérogène (elle mélange MIG et
+TIG) et ne compte que 15 lignes.
 
 \begin{table}[!htbp]
   \centering\small
@@ -104,12 +156,19 @@ poudre, fil fourré ou gaz), principale différence entre procédés à l'arc
   \label{tab:procedes}
 \end{table}
 
-\outrouver{\code{decensor.py} (étape 1), \code{nitrogen_total.py} (étape 2),
-\code{interpass_range.py} (étape 3), \code{categorical_clean.py} (étape 4) ; encodage :
-\code{make_preprocessor} dans \code{ml_dataset.py} (étape 6).}
+\paragraph{Traitement thermique : une variable en partie catégorielle.} La température
+de traitement mélange deux informations. Entre soudure brute (codée \SI{0}{\celsius},
+\SI{0}{\hour}), dégazage (\SI{250}{\celsius} / \SI{14}{\hour}) et revenu (550 à
+\SI{750}{\celsius}), c'est une catégorie : lue comme une quantité, elle ferait du
+dégazage un demi-revenu, alors qu'il sert à évacuer l'hydrogène et modifie peu le métal,
+tandis qu'un revenu le transforme. Entre deux revenus, en revanche, c'est une vraie
+quantité : \SI{700}{\celsius} transforme plus le métal que \SI{600}{\celsius}. Nous
+gardons donc la température et la durée comme nombres, et ajoutons deux entrées 0/1,
+« soudure brute » (610 lignes) et « dégazage » (333 lignes) : elles indiquent le type
+de traitement, la température et la durée son intensité.
 
-\afaire{\item Tests de sensibilité : \code{<x} $\rightarrow x$ ou $x/2$ ; azote total ou
-    total + résiduel.}
+\outrouver{\code{decensor.py} (étape 1), \code{nitrogen_total.py} (étape 2),
+\code{interpass_range.py} (étape 3), \code{categorical_clean.py} (étape 4) ; encodage : \code{make_preprocessor} et indicateurs de traitement (\code{INDICATORS}) dans \code{ml_dataset.py} (étape 6) ; traitement à \SI{250}{\celsius} / \SI{14}{\hour} : notebook, 2.3.4.}
 
 \subsubsection{Mise à l'échelle}
 
@@ -121,9 +180,12 @@ Le carbone varie entre 0,03 et 0,18\,\%, le courant entre 115 et \SI{900}{\amper
   \item \textbf{sans effet} sur les prédictions des autres : régression linéaire simple,
     arbres et forêts (un arbre coupe au même endroit quelle que soit l'unité).
 \end{itemize}
-Tous les modèles reçoivent ainsi la même préparation. Limites : la standardisation est
-sensible aux valeurs extrêmes et ne corrige pas l'asymétrie ; une mise à l'échelle
-robuste ou une transformation logarithmique seront comparées.
+Les arbres et forêts reçoivent la même préparation, sans la standardisation : elle ne
+change pas leurs prédictions, et sans elle leurs seuils se lisent en unités physiques.
+Limites : la standardisation est sensible aux valeurs extrêmes et ne corrige pas
+l'asymétrie. Une mise à l'échelle robuste ou une transformation logarithmique pourraient
+aider les modèles sensibles à l'échelle ; elles ne changeraient rien aux arbres et forêts,
+qui ne dépendent que de l'ordre des valeurs.
 
 \paragraph{Éviter la fuite d'information.} Imputation, encodage et standardisation
 utilisent des statistiques des données (médiane, moyenne\ldots). Calculées sur toute la
@@ -133,5 +195,27 @@ données d'entraînement, à chaque étape de l'évaluation.
 
 \outrouver{\code{make_preprocessor} dans \code{preprocessing/ml_dataset.py} (étape 6).}
 
-\afaire{\item Transformations des variables asymétriques (log1p, mise à l'échelle robuste).
-  \item Vérifier la température Charpy de \SI{188}{\celsius} (\code{Ditt-0.5rch2}).}
+\subsubsection{Mesures répétées}\label{sec:prep-repetees}
+
+Chaque modèle n'apprend que sur les lignes où sa cible est mesurée
+(section~\ref{sec:qualite}). Parmi elles, des lignes ont exactement les mêmes entrées
+(même recette et, pour le Charpy, même température d'essai) : ce sont plusieurs mesures
+d'une même soudure dans les mêmes conditions. Pour chaque cible, elles sont fusionnées en
+\emph{une} ligne, dont la cible est la moyenne des mesures et l'article celui de la
+première ligne ; deux cases vides comptent comme égales. Cela retire de 29 (Charpy) à 56
+(traction) lignes par cible (tableau~\ref{tab:cibles}).
+
+Contrairement à l'imputation et à la standardisation, la fusion est faite sur toute la
+base, avant la validation croisée, sans fuite : chaque moyenne n'utilise que les mesures
+de sa propre recette. Sans elle, deux mesures d'une même recette pourraient être séparées
+entre entraînement et test, et le modèle aurait déjà vu la recette à prédire.
+
+Ce n'est pas la fusion refusée en section~\ref{sec:exploration}, qui regrouperait toutes
+les lignes d'un même métal et mélangerait des essais faits dans des conditions
+différentes (par exemple des Charpy à $-60$ et à \SI{0}{\celsius}). Ici, seules les
+lignes aux entrées identiques, y compris la température d'essai, sont fusionnées : ce
+sont des répétitions de la même mesure, dont la moyenne a un sens.
+
+\outrouver{\code{get_xy} dans \code{preprocessing/ml_dataset.py} (étape 6) ; notebook,
+partie 4.}
+

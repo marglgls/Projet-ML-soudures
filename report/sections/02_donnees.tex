@@ -5,8 +5,8 @@ rassemble des mesures tirées de nombreux articles sur le \emph{métal déposé}
 fondu qui forme le cordon de soudure. Elle compte \textbf{1652 lignes et 44 colonnes}.
 Une valeur absente est notée \code{N} : non rapportée, et non nulle.
 
-\outrouver{données brutes \code{data/welddb/welddb.data} (à télécharger, voir
-\code{README.md}) ; notebook \code{data_preprocessing.ipynb}, « Data Exploration ».}
+\outrouver{données brutes \code{data/welddb/welddb.data} (téléchargées et extraites
+automatiquement au début du notebook, partie 1.2) ; notebook \code{data_preprocessing.ipynb}, partie 2 « Exploration des données brutes ».}
 
 \subsection{Exploration}\label{sec:exploration}
 
@@ -65,46 +65,66 @@ pour 1652 lignes. Nous gardons une ligne par essai pour conserver les températu
 et les traitements comme entrées. Les lignes d'un même cordon étant très proches, il
 faudra en tenir compte dans l'évaluation (section~\ref{sec:methodes}).
 
-\outrouver{\code{context/columns.json} ; notebook, « Analyses complémentaires › Une ligne
-correspond à un essai ».}
+\outrouver{\code{context/columns.json} ; notebook, 2.3.3 « Une ligne = un essai, pas une soudure ».}
 
 \subsubsection{Valeurs manquantes}
 
-\paragraph{Dans les entrées.} De 0\,\% (carbone, manganèse) à 96\,\% (tungstène) de
-valeurs manquent selon les colonnes (figure~\ref{fig:manquants}) ; aucune ligne n'est
-complète. Ces absences dépendent de l'article : 21 des 46 articles ne donnent jamais le
-nickel, et les lignes sans nickel sont à 88\,\% des soudures manuelles, contre 49\,\%
-pour les autres. Les valeurs ne manquent donc pas au hasard (pas \emph{MCAR}) ; leur
-absence s'explique par l'article, connu (\emph{MAR}). Un nickel omis parce que très
-faible relèverait du \emph{MNAR}, possible mais invérifiable.
+De 0\,\% (carbone, manganèse) à 96\,\% (tungstène) de valeurs manquent selon les
+colonnes d'entrée (figure~\ref{fig:manquants}) ; aucune ligne n'est complète. Ces cases
+ne sont pas vides au hasard (\emph{MCAR} exclu) : les lignes sans nickel sont à 88\,\% des
+soudures manuelles, contre 49\,\% pour les autres, alors que le hasard seul donnerait deux
+proportions proches. Pour choisir le traitement, nous distinguons trois raisons pour
+lesquelles une case est vide.
 
-\paragraph{Dans les résultats d'essais.} Chaque ligne ne contient qu'un essai : chaque
-grandeur n'est connue que sur une partie des lignes (environ 880 pour le Charpy, 700 à 780
-pour la traction). Ces cases sont structurellement vides, pas manquantes : l'essai n'a
-pas été fait sur cette éprouvette. Fusionner les lignes d'un même métal ne les remplirait
-pas sans perte, car un métal est souvent testé en Charpy à plusieurs températures : une
-seule ligne ne garderait qu'un de ces essais, ou leur moyenne, sans sens physique. Ces
-cases ne sont donc jamais complétées, et chaque modèle n'apprend que sur les articles qui
-ont fait son essai (26 sur 46 pour le Charpy). La dureté (138 lignes), la FATT (31) et la microstructure
-(environ 90) sont trop rares pour être apprises.
+\paragraph{1. La valeur est négligeable, l'article ne la rapporte pas.} Un article qui
+étudie un acier au chrome donne forcément sa teneur en chrome. S'il ne donne \emph{jamais}
+un élément d'alliage (Ni, Cr, Mo, V, Nb), c'est très probablement que ses aciers n'en
+contiennent que des traces : 21 des 46 articles ne donnent jamais le nickel. La case est
+alors vide \emph{à cause de sa valeur} (\emph{MNAR}). La médiane des valeurs rapportées,
+tirée surtout d'aciers alliés, serait trop haute. Cette hypothèse ne se vérifie pas ligne
+par ligne, mais c'est celle que nous retenons : la teneur est mise à 0
+(section~\ref{sec:prep-manquantes}).
 
-\outrouver{notebook, « Analyses complémentaires › Valeurs manquantes des entrées » et
-« Lignes complètes ».}
+\paragraph{2. La valeur existe, mais elle n'est pas connue.} C'est le cas de l'oxygène et
+de l'azote (toujours présents dans le métal fondu), du titane et de l'aluminium
+(désoxydants), des paramètres de soudage, et des trous isolés d'un élément d'alliage dans
+un article qui le donne sur ses autres lignes. Une absence ne veut pas dire zéro : la
+valeur n'a pas été rapportée par cet article, ou a été oubliée. Le manque s'explique par
+l'article, connu pour chaque ligne (\emph{MAR}). La case est remplie par la médiane,
+apprise sur les seules données d'entraînement, et un indicateur « valeur manquante »
+transmet au modèle l'information qu'elle a été devinée.
+
+\paragraph{3. La case est sans objet : l'essai n'a pas été fait.} La plupart des lignes ne
+contiennent qu'un type d'essai (144 seulement ont à la fois des résultats de traction et un
+résultat Charpy). Chaque résultat n'est donc connu que sur une partie des lignes (environ
+880 pour le Charpy, 700 à 780 pour la traction). C'est aussi le cas d'une entrée : la
+température d'essai Charpy, vide sur les lignes de traction. Les autres entrées décrivent
+la soudure, et sont identiques sur toutes les lignes d'un même cordon quel que soit
+l'essai. Ces cases ne sont pas manquantes : il n'y a rien à deviner. Fusionner les lignes
+d'un même métal ne les remplirait pas sans perte, car un métal est souvent testé en Charpy
+à plusieurs températures : une seule ligne ne garderait qu'un de ces essais, ou leur
+moyenne, sans sens physique. Ces cases ne sont donc jamais complétées. Chaque modèle
+n'apprend que sur les lignes où son essai a été fait (26 articles sur 46 pour le Charpy),
+et la température Charpy ne sert d'entrée qu'au modèle du Charpy. La dureté (138 lignes),
+la FATT (31) et la microstructure (environ 90) sont trop rares pour être apprises.
+
+\outrouver{notebook, 2.3.1 « Valeurs manquantes : au hasard ou non ? », 2.3.2 « Lignes complètes » et 5.1 « Valeurs manquantes par entrée ».}
 
 \subsubsection{Types de variables}
 
 \begin{itemize}
   \item \textbf{Numériques} : composition, réglages de soudage, traitement et résultats
-    d'essais. Certaines valeurs sont écrites en texte (\code{<0.002}, \code{67tot33res},
-    \code{150-200}) et doivent être converties (section~\ref{sec:preprocessing}).
+    d'essais. Ce sont des nombres, même si quelques cases du fichier les écrivent avec une
+    annotation : \code{<0.002} (sous la limite de détection de 0,002), \code{67tot33res}
+    (azote total de 67~ppm, dont 33 résiduels), \code{150-200} (plage de températures).
+    Ces cases sont converties en nombre (section~\ref{sec:preprocessing}).
   \item \textbf{Catégorielles nominales} : type de courant, polarité et procédé. Aucune
     n'est ordinale : la polarité \code{0} ne se situe pas entre \code{+} et \code{-},
     elle désigne le courant alternatif. Les catégories sont très déséquilibrées : soudage
     manuel MMA sur 1140 lignes sur 1652, courant alternatif sur 42 seulement.
 \end{itemize}
 
-\outrouver{notebook, « Data Exploration » (valeurs non numériques, fréquences des
-catégories).}
+\outrouver{notebook, 2.2 « Diagnostic des entrées » (valeurs non numériques, échelles, fréquences des catégories).}
 
 \subsubsection{Unités de mesure}
 
@@ -114,19 +134,22 @@ l'unité de leur colonne ont révélé des ppm notés en \%, et l'inverse
 (tableau~\ref{tab:decodage}). Une fois corrigé, il est sans effet sur les modèles après
 standardisation, mais une unité commune sera nécessaire pour les recommandations.
 
-\afaire{\item Piste à vérifier en bibliographie : l'effet d'un traitement thermique
-    dépend d'une combinaison de sa température (en kelvins) et du logarithme de sa durée
-    (paramètre de Hollomon-Jaffe). Créer cette variable pourrait aider les modèles.}
 
 \subsubsection{Distributions et valeurs extrêmes}
 
 \paragraph{Grandeurs à prédire.} Les propriétés de traction ont des distributions
 régulières (figure~\ref{fig:cibles}). Le Charpy présente deux pics : 356 lignes à
-exactement \SI{100}{\joule} et 118 à \SI{28}{\joule}. Certains articles, surtout ceux
-d'Evans, ne donnent que la température à laquelle la soudure atteint ces seuils :
-« \SI{-38}{\celsius}, \SI{100}{\joule} » signifie « \SI{100}{\joule} atteints à
-\SI{-38}{\celsius} ». Ce sont des points de la courbe énergie--température, calculés et
-non mesurés.
+exactement \SI{100}{\joule} et 118 à \SI{28}{\joule}, presque toutes issues des articles
+d'Evans. Pour caractériser une soudure, on casse des éprouvettes à plusieurs températures
+choisies et on mesure leur énergie : la courbe énergie--température passe de quelques
+joules à froid (rupture fragile) à plus de \SI{100}{\joule} à chaud (rupture ductile).
+Ces articles semblent résumer cette courbe par la température à laquelle elle atteint
+\SI{100}{\joule} ou \SI{28}{\joule}, deux seuils classiques : « \SI{-38}{\celsius},
+\SI{100}{\joule} » signifierait « \SI{100}{\joule} atteints à \SI{-38}{\celsius} ». Cette
+température est déduite des mesures, par interpolation entre les éprouvettes cassées. Sur
+ces lignes, l'énergie est donc fixée d'avance et c'est la température qui est le résultat
+de l'essai, à l'inverse des autres lignes. Cette interprétation reste à vérifier dans les
+articles.
 
 \begin{figure}[!htbp]
   \centering
@@ -136,19 +159,34 @@ non mesurés.
   \label{fig:cibles}
 \end{figure}
 
-\paragraph{Valeurs extrêmes.} La règle de l'IQR ne convient pas : 64\,\% des
-températures entre passes valent exactement \SI{200}{\celsius}, et elle déclarerait
-aberrantes toutes les autres. Nous avons donc examiné les valeurs extrêmes une à une.
-Ce sont presque toujours des mesures réelles, que nous gardons :
+\paragraph{Valeurs extrêmes.} La règle de l'IQR signale comme suspecte toute valeur
+éloignée de plus de 1,5 écart interquartile du premier ou du troisième quartile. Nous
+n'avons pas supprimé les valeurs qu'elle signale, pour deux raisons.
 \begin{itemize}
-  \item des séries volontaires (10 soudures très riches en soufre et en phosphore) ;
-  \item des soudures hors norme mais cohérentes (une soudure à 9\,\% de chrome a la plus
-    forte résistance et le plus faible allongement) ;
-  \item un effet de source (l'article le plus ancien, Wolst-1974, détient quatre valeurs
-    extrêmes).
+  \item \textbf{Elle signale des valeurs banales.} 64\,\% des températures entre passes
+    valent exactement \SI{200}{\celsius}, une consigne courante : le premier et le
+    troisième quartile valent tous les deux \SI{200}{\celsius}, l'écart interquartile est
+    nul, et la règle signale toutes les autres valeurs, même un \SI{250}{\celsius}
+    parfaitement normal.
+  \item \textbf{Les valeurs vraiment extrêmes sont des mesures réelles.} Examinées une à
+    une, ce sont presque toujours :
+    \begin{itemize}
+      \item des séries volontaires (10 soudures très riches en soufre et en phosphore) ;
+      \item des soudures hors norme mais cohérentes (une soudure à 9\,\% de chrome a la
+        plus forte résistance et le plus faible allongement) ;
+      \item un effet de source (l'article le plus ancien, Wolst-1974, détient quatre
+        valeurs extrêmes).
+    \end{itemize}
+    Seule exception, une erreur de saisie : un essai Charpy à \SI{188}{\celsius}
+    (\code{Ditt-0.5rch2}), seule température d'essai au-dessus de \SI{70}{\celsius},
+    alors que les quatre autres soudures de l'article sont toutes testées à 20, $-10$ et
+    \SI{-30}{\celsius}, et celle-ci à 20, 188 et \SI{-30}{\celsius}. Il s'agit presque
+    sûrement de \SI{-10}{\celsius} ; dans le doute, cet essai est retiré.
 \end{itemize}
+Supprimer ces lignes ferait perdre justement les aciers rares que le modèle doit
+apprendre à prédire.
 
-\outrouver{revue détaillée : \code{preprocessing/outlier_*.py}, conclusions dans
+\outrouver{énergies Charpy fixes : notebook, 2.3.5 ; valeurs extrêmes signalées : notebook, 2.2 ; revue détaillée : \code{preprocessing/outlier_*.py}, conclusions dans
 \code{context/columns.json} (champ \code{outliers}).}
 
 \subsubsection{Relations entre variables}
@@ -173,9 +211,10 @@ grandeurs à prédire. Elle indique un lien, pas une cause.
   \label{fig:correlations}
 \end{figure}
 
-\paragraph{Analyse en composantes principales (ACP).} Appliquée aux 995 métaux distincts
-(un métal testé plusieurs fois compte une fois), après imputation par la médiane et
-standardisation (figure~\ref{fig:acp}) :
+\paragraph{Analyse en composantes principales (ACP).} Appliquée aux 983 combinaisons
+d'entrées distinctes (les lignes qui ne diffèrent que par l'essai réalisé, par exemple
+plusieurs températures Charpy pour une même soudure, ne comptent qu'une fois), après
+imputation par la médiane et standardisation (figure~\ref{fig:acp}) :
 \begin{itemize}
   \item \textbf{les entrées ne sont pas redondantes} : deux axes n'expliquent que 38\,\%
     de la variance ; nous les gardons toutes ;
@@ -183,14 +222,17 @@ standardisation (figure~\ref{fig:acp}) :
     riches en Cr, Mo, V, N et Nb sont presque toujours traitées thermiquement (94\,\% de
     celles à plus de 1\,\% de chrome), donc ces variables varient ensemble. On ne pourra
     pas distinguer l'effet des alliages de celui du traitement ;
-  \item \textbf{l'axe 2 (17\,\%) correspond à la chaleur apportée par le soudage} : il
+  \item \textbf{l'axe 2 (18\,\%) correspond à la chaleur apportée par le soudage} : il
     sépare l'arc submergé (\SI{640}{\ampere} médian) de l'arc manuel (\SI{170}{\ampere}).
     Courant, tension et énergie de soudage varient ensemble, car l'énergie se calcule à
     partir des deux autres et de la vitesse : leurs effets ne pourront pas être séparés.
     Les recommandations porteront sur l'énergie, toujours renseignée et qui intègre la
     vitesse.
 \end{itemize}
-Ces résultats restent les mêmes avec d'autres méthodes d'imputation. Les modèles devront
+Ces deux axes restent les mêmes si l'on comble les valeurs inconnues (cas~2 de la
+section sur les valeurs manquantes) par la moyenne, les plus proches voisins ou une
+imputation itérative au lieu de la médiane : mêmes variables principales, variance des
+axes à un point près. Les modèles devront
 couvrir des familles de soudures très différentes.
 
 \begin{figure}[!htbp]
@@ -198,16 +240,8 @@ couvrir des familles de soudures très différentes.
   \includegraphics[width=\linewidth]{acp}
   \caption{ACP des entrées numériques : (a) variance expliquée par composante,
     (b) cercle des corrélations (flèches bleues : variables bien représentées), (c)
-    projection des 995 métaux, par famille de procédé.}
+    projection des 983 combinaisons d'entrées, par famille de procédé.}
   \label{fig:acp}
 \end{figure}
 
-\outrouver{notebook, « Analyse descriptive » (figures enregistrées dans
-\code{report/figures/}) et « Énergie de soudage, courant et tension ».}
-
-\afaire{\item Ajouter au notebook la comparaison des méthodes d'imputation avant l'ACP
-    (médiane, plus proches voisins, imputation itérative).
-  \item À décider en équipe : le traitement à \SI{250}{\celsius} / \SI{14}{\hour}
-    (333 lignes, surtout de traction) est-il un simple dégazage équivalent à « brut » ?
-  \item Recopier les résultats de traction sur les lignes Charpy du même état, utile
-    seulement si la qualité combine résistance et ténacité.}
+\outrouver{notebook, partie 5 « Analyse descriptive des données nettoyées » (figures enregistrées dans \code{report/figures/}) : 5.3 corrélations, 5.4 ACP et sa « Sensibilité à la méthode d'imputation », 5.6 « Énergie de soudage, courant et tension ».}
