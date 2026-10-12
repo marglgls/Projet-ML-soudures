@@ -123,6 +123,21 @@ def get_xy(df, target):
     return merged[x_cols], merged[y_col], merged['source']
 
 
+def get_x_unlabeled(df, target):
+    """X non labellisé pour une cible : lignes où elle n'est pas mesurée.
+
+    Mêmes colonnes d'entrée que `get_xy` (dont la température d'essai pour
+    le Charpy), index remis à zéro. Les doublons ne sont pas fusionnés
+    (il n'y a pas de cible à moyenner) : le pseudo-étiquetage d'une
+    recette répétée est sans danger. Renvoie (X_unlab, groups_unlab).
+    """
+    y_col = TARGETS[target]
+    rows = df[df[y_col].isna()]
+    x_cols = input_columns(df) + ([CHARPY_T] if target == 'charpy' else [])
+    return (rows[x_cols].reset_index(drop=True),
+            rows['source'].reset_index(drop=True))
+
+
 def make_preprocessor(X, impute='median'):
     """Unfitted ColumnTransformer for the columns of X.
 
