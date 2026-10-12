@@ -116,12 +116,48 @@ vérification de l'absence de fuite : notebook, partie 4 (étape 6).}
 
 \subsubsection{Mesures d'erreur}
 
-\afaire{\item Justifier les mesures : RMSE et MAE, dans l'unité de la cible
-    (\si{\mega\pascal}, \%, \si{\joule}), et $R^2$ ; moyenne $\pm$ écart-type sur les plis.
-  \item Choix final par la règle de l'écart-type (cours 2) : parmi les modèles presque
-    aussi bons que le meilleur, garder le plus simple.
-  \item Coder le protocole commun (modèle + cible $\rightarrow$ scores), à faire en
-    premier --- \textbf{Salomé (proposé)}.}
+\paragraph{Prédictions hors pli.} La validation croisée prédit chaque ligne une seule
+fois, par le modèle entraîné sans son article. On obtient ainsi, pour les $n$ lignes où la
+cible est mesurée, une valeur réelle $y_i$ et une prédiction hors pli $\hat y_i$. Les
+mesures sont calculées sur ces $n$ couples, tous plis réunis.
+
+\paragraph{Trois mesures.}
+\begin{itemize}
+  \item \textbf{RMSE}, racine de l'erreur quadratique moyenne :
+    \[ \mathrm{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n} (y_i - \hat y_i)^2}. \]
+    Elle s'exprime dans l'unité de la cible (\si{\mega\pascal}, \%, \si{\joule}) et pèse
+    fortement les grosses erreurs. C'est voulu : rater une soudure fragile de
+    \SI{40}{\joule} est plus grave que dix erreurs de \SI{4}{\joule}. C'est aussi ce que
+    minimise le réglage des hyperparamètres (boucle intérieure).
+  \item \textbf{MAE}, erreur absolue moyenne :
+    \[ \mathrm{MAE} = \frac{1}{n}\sum_{i=1}^{n} \lvert y_i - \hat y_i \rvert. \]
+    C'est l'erreur « typique » sur une soudure, moins sensible aux quelques grosses
+    erreurs. Une RMSE bien plus grande que la MAE signale des erreurs concentrées sur
+    quelques lignes, souvent les valeurs extrêmes.
+  \item \textbf{Coefficient de détermination} $R^2$ :
+    \[ R^2 = 1 - \frac{\sum_{i} (y_i - \hat y_i)^2}{\sum_{i} (y_i - \bar y)^2},
+       \qquad \bar y = \frac{1}{n}\sum_{i} y_i. \]
+    Il compare l'erreur du modèle à celle d'une prédiction constante égale à la moyenne :
+    1 pour une prédiction parfaite, 0 pour pas mieux que la moyenne, négatif pour pire. Sans
+    unité, il permet de comparer des cibles d'unités différentes.
+\end{itemize}
+
+\paragraph{Pourquoi la référence a un $R^2$ négatif.} Le modèle de référence prédit la
+moyenne de la cible \emph{sur les articles d'entraînement}, alors que $\bar y$ est la
+moyenne sur toutes les lignes. Quand un article de test a des valeurs différentes des
+autres, la moyenne d'entraînement est décalée : son $R^2$ est légèrement négatif ($-0{,}02$
+à $-0{,}13$, tableau~\ref{tab:arbres}). Un modèle utile doit faire mieux que cette
+référence, pas seulement mieux que zéro.
+
+\paragraph{Pourquoi tous plis réunis.} Les plis regroupés par article n'ont ni la même
+taille ni les mêmes aciers. Un $R^2$ calculé pli par pli serait instable : dans un pli dont
+les valeurs varient peu, le dénominateur est petit et le $R^2$ devient très négatif pour
+une erreur modeste. Nous calculons donc les mesures une fois, sur toutes les prédictions
+hors pli, et donnons à part l'\textbf{écart-type de la RMSE entre les 5 plis}, qui mesure
+la stabilité du modèle d'un groupe d'articles à l'autre.
+
+\outrouver{fonction \code{evaluer} dans \code{modeles.ipynb}, partie 1 (et
+\code{evaluer_semi} dans \code{preprocessing/coreg.py} pour le semi-supervisé).}
 
 \subsection{Entraînement et évaluation des modèles}\label{sec:modeles}
 
@@ -307,22 +343,6 @@ conditions d'essai diffèrent.
 forêt), partie 9 (comparaison de tous les modèles) ; figures \code{arbre_yield.pdf} et
 \code{foret_predit_reel.pdf} dans \code{report/figures/} ; schéma de la validation
 imbriquée : \code{report/schema_validation_imbriquee.py}.}
-
-\afaire{\item Extra-Trees, avec la même fonction d'évaluation et les mêmes plis.
-  \item Importance des variables par permutation ; attention aux variables corrélées
-    (Cr, Mo, traitement), dont l'importance est surestimée --- \textbf{?}
-  \item Classification complémentaire « Charpy $\geq$ \SI{47}{\joule} à la température
-    d'essai ? » : comparer un arbre ou une forêt de classification au même modèle en
-    régression suivi du seuil, sur les mêmes plis.
-    \begin{itemize}
-      \item Seulement les 404 énergies mesurées (13 articles) : sur les lignes fixées,
-        l'étiquette est imposée par la convention (\SI{100}{\joule} toujours « bonne »,
-        \SI{28}{\joule} toujours « mauvaise »).
-      \item Classes déséquilibrées (69\,\% de « bonnes » à \SI{47}{\joule}, 84\,\% à
-        \SI{27}{\joule}) : précision équilibrée, F1, matrice de confusion.
-      \item Piste facultative : classes de résistance de la norme des électrodes
-        (ISO 2560, seuils à vérifier) pour la traction.
-    \end{itemize}}
 
 \subsubsection{Apprentissage semi-supervisé}\label{sec:semi}
 
