@@ -38,6 +38,16 @@ plus de 50\,\%, sont gardés : leurs cases vides valent 0 (paragraphe suivant), 
 une teneur significative dans 13 à 23 articles, assez pour que le modèle apprenne leur
 effet.
 
+\paragraph{Ce que coûte ce retrait.} Retirer une colonne retire aussi ses vraies valeurs.
+Environ 125 lignes de la base (sur 1652) contiennent pourtant une teneur notable d'un
+élément retiré : du cuivre à au moins 0,3\,\% (79 lignes), du bore à au moins
+\SI{20}{ppm} (35), du tungstène (18) ou du cobalt (5) à au moins 0,1\,\%. Le modèle ne voit
+pas cet élément : il attribue son effet à d'autres variables, et ces soudures sortent du
+champ des recommandations. Le cuivre est le cas le plus coûteux : il augmente la
+résistance, et plusieurs articles (séries d'Evans, Es-Souni) l'ont fait varier
+volontairement pour mesurer son effet. Le garder, mis à 0 quand un article ne le rapporte
+jamais comme Ni ou Cr, serait une piste à tester.
+
 \paragraph{Éléments d'alliage jamais rapportés.} Ni, Cr, Mo, V et Nb sont des
 additions volontaires. Quand un article ne donne \emph{jamais} l'un d'eux (vide sur toutes
 ses lignes), c'est un choix de l'article et non un oubli : ses soudures ne sont pas

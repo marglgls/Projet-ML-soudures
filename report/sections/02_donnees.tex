@@ -94,6 +94,10 @@ l'article, connu pour chaque ligne (\emph{MAR}). La case est remplie par la méd
 apprise sur les seules données d'entraînement, et un indicateur « valeur manquante »
 transmet au modèle l'information qu'elle a été devinée.
 
+Ces deux règles ne valent que pour les colonnes gardées. Une colonne trop vide pour être
+complétée sans être presque entièrement inventée est retirée en entier : Sn, As et Sb
+(cas~2), Cu, B, Co et W (cas~1) ; voir section~\ref{sec:prep-manquantes}.
+
 \paragraph{3. La case est sans objet : l'essai n'a pas été fait.} La plupart des lignes ne
 contiennent qu'un type d'essai (144 seulement ont à la fois des résultats de traction et un
 résultat Charpy). Chaque résultat n'est donc connu que sur une partie des lignes (environ
