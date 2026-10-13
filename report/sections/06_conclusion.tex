@@ -1,5 +1,36 @@
 \section{Conclusion et recommandations}\label{sec:conclusion}
 
-\afaire{\item Approche la plus appropriée pour prédire la qualité de soudure.
-  \item Recommandations pour une bonne soudure (variables influentes, plages favorables),
-    avec leurs limites : corrélations issues de la littérature, pas de causalité.}
+\paragraph{L'approche la plus appropriée.} La forêt aléatoire, réglée par validation
+croisée imbriquée groupée par article, est le meilleur modèle sur les cinq grandeurs :
+$R^2$ de 0,20 (Charpy) à 0,47, RMSE de 12 à \SI{31}{\percent} sous celle de la moyenne.
+Ni les modèles linéaires, avec ou sans réduction de dimension, ni l'apprentissage
+semi-supervisé ne font mieux (section~\ref{sec:modeles}).
+
+\paragraph{Ce que montrent les résultats.} La difficulté principale n'est pas le choix du
+modèle, mais le passage à une étude inconnue : la forêt obtient un $R^2$ de 0,70 à 0,80
+quand l'article testé est déjà connu, contre 0,20 à 0,47 quand il ne l'est pas. Chaque
+article a ses aciers et ses conditions d'essai. Les prédictions ramènent en outre les
+soudures extrêmes vers la moyenne ; c'est pourquoi le verdict « bonne / mauvaise » tiré
+des seuils de la norme ISO 2560 laisse passer la plupart des soudures mauvaises
+(section~\ref{sec:classification}).
+
+\paragraph{Recommandations, avec prudence.} Les tendances suivantes ressortent à la fois
+des corrélations, des modèles et de la métallurgie :
+\begin{itemize}
+  \item les éléments d'alliage (Mo, Mn, V, Cr, Nb) augmentent la résistance mais
+    réduisent la ductilité : une bonne soudure est un compromis, à régler selon l'usage ;
+  \item un traitement thermique plus long ou plus chaud abaisse la résistance ;
+  \item un fort apport de chaleur au soudage et les impuretés (S, P) vont avec une
+    striction plus faible ;
+  \item la ténacité se juge à la température d'usage de la pièce : une soudure
+    satisfaisante à \SI{0}{\celsius} peut être fragile à \SI{-40}{\celsius}.
+\end{itemize}
+Ces tendances viennent de données publiées, pas d'expériences contrôlées : elles
+décrivent des corrélations, pas des causes. Les aciers alliés étant presque toujours
+traités, par exemple, l'effet des alliages et celui du traitement ne se séparent pas.
+En l'état, le modèle peut servir à trier des recettes candidates, mais ne remplace pas
+les essais.
+
+\paragraph{Pistes.} Des données plus variées (plus d'articles, d'aciers et de procédés),
+des modèles par famille d'acier, et un traitement à part des lignes Charpy fixées à
+\SI{100}{\joule} et \SI{28}{\joule} sont les pistes les plus prometteuses.

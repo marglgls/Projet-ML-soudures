@@ -20,7 +20,7 @@
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{\small Prédiction de qualité de soudures}
-\rhead{\small Rapport complet\ifsuivi\ --- \textcolor{BrickRed}{version de travail}\fi}
+\rhead{\small Rapport complet --- V1 du 13/10/2026}
 \cfoot{\thepage}
 
 \begin{document}
@@ -30,7 +30,7 @@
   {\LARGE\bfseries Prédiction de qualité de soudures}\\[6pt]
   {\large Projet Machine Learning --- CentraleSupélec, 3A}\\[14pt]
   Pablo Bosch \quad Myriam Boulaares \quad Salomé Fonvielle \quad Margaux Langlois\\[6pt]
-  \today
+  V1 --- 13 octobre 2026
 \end{center}
 \thispagestyle{fancy}
 
@@ -39,10 +39,11 @@
 Nous prédisons la résistance, la ductilité et la ténacité de soudures d'acier à partir
 de leur composition, de leur procédé et de leur traitement thermique, sur une base
 publique de 1652 essais très incomplète et hétérogène. Ce rapport décrit le nettoyage
-des données, le protocole d'évaluation, puis compare plusieurs modèles.
+des données, le protocole d'évaluation, puis compare plusieurs modèles. La forêt
+aléatoire est la meilleure ($R^2$ de 0,20 à 0,47 sur des articles inconnus). Le verdict
+« bonne / mauvaise » tiré de ses prédictions et des seuils de la norme ISO 2560 détecte
+trop peu de soudures mauvaises : la difficulté reste de généraliser à une étude inconnue.
 \end{abstract}
-
-\afaire{\item Mettre le résumé à jour avec les résultats principaux.}
 
 % Petite table des matières (sections et sous-sections)
 {\small\setcounter{tocdepth}{2}\tableofcontents}

@@ -46,3 +46,14 @@ X, y, groups = get_xy(load_cleaned(), 'yield')
 model = Pipeline([('prep', make_preprocessor(X)), ('reg', Ridge())])
 cross_val_score(model, X, y, groups=groups, cv=GroupKFold(5))
 ```
+
+## Modelling and classification (`modeles.ipynb`)
+
+Run after `data_preprocessing.ipynb`, top to bottom. All models share one protocol: one target at a time (`get_xy`), nested `GroupKFold` cross-validation by source article, metrics (RMSE, MAE, R²) on out-of-fold predictions; long computations are cached in `cache_modeles/` (git-ignored).
+
+- Parts 3–7: mean baseline, linear regression (Pablo), PCA regression and PLS (Myriam), tree, bagging and random forest (Salomé), semi-supervised COREG and self-training (Margaux). Part 9 compares all models: the random forest is best (R² 0.20–0.47 by article).
+- Part 10: good / bad weld verdict — ISO 2560-A class E 42 3 thresholds (yield ≥ 420 MPa, elongation ≥ 20 %, Charpy ≥ 47 J at −30 °C), all three required, applied to the forest's out-of-fold predictions. Results are unsatisfactory (most bad welds are accepted); improvement ideas are listed but not implemented.
+
+## Report (`report/`)
+
+`rapport.tex` is the full working report (one file per section in `sections/`), `rapport_final.tex` the ~5-page report to hand in. Figures in `report/figures/` are produced by the notebooks. Compile from `report/` with `latexmk -pdf rapport.tex`.

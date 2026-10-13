@@ -57,14 +57,14 @@ ténacité sont rarement mesurées sur la même ligne.
 
 Ce choix exclut les modèles de classification, pas les familles de modèles (arbres,
 forêts, plus proches voisins existent en régression). Son coût : la régression ne se
-concentre pas sur les erreurs proches du seuil. Une classification est donc testée en
-complément sur le Charpy, seule propriété avec un seuil commun à tous les aciers :
-l'énergie doit atteindre \SI{47}{\joule} ou \SI{27}{\joule} à une température d'essai
-donnée. La norme ISO 2560 (électrodes enrobées pour aciers non alliés) classe les
+concentre pas sur les erreurs proches du seuil (section~\ref{sec:classification}). Pour le
+Charpy, l'énergie doit atteindre \SI{47}{\joule} ou \SI{27}{\joule} à une température
+d'essai donnée. La norme ISO 2560 (électrodes enrobées pour aciers non alliés) classe les
 électrodes selon l'un ou l'autre seuil, avec un symbole qui indique la température
 d'essai, de $+20$ à \SI{-60}{\celsius} ; la norme américaine AWS A5.1 exige par exemple
-\SI{27}{\joule} à \SI{-29}{\celsius} pour l'électrode courante E7018. Le seuil de
-résistance, lui, dépend de la classe d'acier soudé (section~\ref{sec:modeles}).
+\SI{27}{\joule} à \SI{-29}{\celsius} pour l'électrode courante E7018. Les seuils
+retenus pour les trois cibles et leur application sont décrits en
+section~\ref{sec:classification}.
 
 \paragraph{La température d'essai Charpy : une entrée, pas un levier.} L'énergie Charpy
 dépend fortement de la température à laquelle on casse l'éprouvette : la même soudure
@@ -108,11 +108,6 @@ fuite est acceptée pour l'instant.
 
 \outrouver{fonction \code{weld_source} dans \code{preprocessing/ml_dataset.py} ;
 vérification de l'absence de fuite : notebook, partie 4 (étape 6).}
-
-\afaire{\item Validation croisée imbriquée : un niveau extérieur (par article) pour mesurer
-    la performance, un niveau intérieur (par article) pour régler les hyperparamètres.
-  \item Ne pas utiliser l'erreur OOB des forêts : elle ignore les articles et serait trop
-    optimiste.}
 
 \subsubsection{Mesures d'erreur}
 
@@ -165,16 +160,79 @@ Chaque famille de modèles est appliquée aux trois cibles principales.
 
 \subsubsection{Modèles de référence et modèles linéaires}
 
-\afaire{\item Référence : prédire la moyenne (tout modèle doit faire mieux).
-  \item Régression linéaire, sélection de variables pas à pas, Ridge, Lasso ; lecture des
-    coefficients --- \textbf{Salomé (proposé)}.}
+\paragraph{Référence : la moyenne.} Elle prédit, pour toute soudure, la moyenne de la
+cible sur les articles d'entraînement. Tout modèle doit faire mieux qu'elle ; son $R^2$
+est légèrement négatif ($-0{,}02$ à $-0{,}13$, tableau~\ref{tab:arbres}).
+
+\paragraph{Régression linéaire multivariée.} Elle prédit chaque cible comme une somme
+pondérée de toutes les entrées, les poids minimisant l'erreur quadratique (moindres
+carrés ordinaires). Elle n'a aucun hyperparamètre et reçoit la préparation commune, avec
+standardisation, ce qui rend ses poids comparables entre eux.
+\begin{itemize}
+  \item \textbf{Elle fait moins bien que la moyenne} sur les cinq grandeurs ($R^2$ de
+    $-0{,}37$ à $-0{,}89$, tableau~\ref{tab:arbres}).
+  \item \textbf{Elle apprend pourtant quelque chose} : $R^2$ de 0,54 à 0,73 sur les données
+    apprises, de 0,36 à 0,67 en découpage aléatoire. Mais elle ne se transfère pas à un
+    article inconnu : hors du domaine des autres articles, la droite se prolonge jusqu'à
+    des valeurs impossibles (\SI{-185}{\joule} au Charpy, \SI{-85}{\mega\pascal} de limite
+    d'élasticité).
+  \item \textbf{Ses poids retrouvent des tendances métallurgiques} (molybdène, manganèse et
+    vanadium augmentent la limite d'élasticité ; un revenu plus long ou plus chaud la
+    diminue), mais les entrées corrélées se partagent l'effet de façon instable : tension
+    et courant ont des poids presque opposés sur le Charpy.
+\end{itemize}
+Ridge et Lasso, qui limiteraient ces poids extrêmes, n'ont pas été testés.
+
+\outrouver{notebook \code{modeles.ipynb}, partie 3 (référence) et partie 4 (régression
+linéaire : résultats, biais et variance, prédit contre réel, coefficients) ; figure
+\code{rl_predit_reel.pdf}.}
 
 \subsubsection{Réduction de dimension}
 
-\afaire{\item Régression sur les composantes de l'ACP et PLS ; nombre de composantes réglé
-    par validation croisée.
-  \item Charpy : modéliser les deux types de lignes ensemble ou séparément ? Tester les
-    deux --- \textbf{?}}
+\paragraph{Principe.} Les entrées sont nombreuses et en partie corrélées
+(section~\ref{sec:exploration}). La \textbf{régression sur composantes principales}
+(PCR) les résume par les $k$ premiers axes d'une ACP, puis fait une régression linéaire
+sur ces axes. L'ACP ignore la cible ; la \textbf{PLS} construit au contraire des axes qui
+tiennent compte de la cible. Le nombre d'axes $k$ (2, 5, 10, 15, 20 ou 25) est choisi par
+la boucle intérieure de la validation croisée.
+
+\begin{table}[!htbp]
+  \centering\small
+  \begin{tabular}{@{}l r r r r r@{}}
+    \toprule
+    \textbf{Grandeur} & \textbf{Moyenne} & \textbf{Rég. linéaire} & \textbf{PCR} &
+    \textbf{PLS} & \textbf{Forêt} \\
+    \midrule
+    Limite d'élasticité      & $-0{,}02$ & $-0{,}78$ & $-0{,}05$ & $-0{,}17$ & $\mathbf{0{,}44}$ \\
+    Résistance à la traction & $-0{,}05$ & $-0{,}75$ & $0{,}10$  & $0{,}15$  & $\mathbf{0{,}44}$ \\
+    Allongement              & $-0{,}03$ & $-0{,}87$ & $-0{,}06$ & $-0{,}21$ & $\mathbf{0{,}29}$ \\
+    Striction                & $-0{,}13$ & $-0{,}37$ & $0{,}46$ & $0{,}32$ & $\mathbf{0{,}47}$ \\
+    Énergie Charpy           & $-0{,}04$ & $-0{,}89$ & $-0{,}33$ & $0{,}04$  & $\mathbf{0{,}20}$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{$R^2$ en validation croisée par article des modèles à réduction de dimension,
+    face à la régression linéaire sur toutes les entrées et à la forêt aléatoire.}
+  \label{tab:reduction}
+\end{table}
+
+\paragraph{Résultats.}
+\begin{itemize}
+  \item \textbf{Réduire la dimension corrige l'essentiel de l'échec de la régression
+    linéaire} (tableau~\ref{tab:reduction}) : avec peu d'axes, les poids restent modérés et
+    la droite extrapole moins. Le $R^2$ passe de $-0{,}37$ à $-0{,}89$ à des valeurs proches
+    de 0 ou positives.
+  \item \textbf{Mais seule la striction est bien prédite} : la PCR y égale presque la
+    forêt ($R^2$ de 0,46 contre 0,47). Ailleurs, PCR et PLS font à peine mieux que la moyenne, voire moins
+    bien (limite d'élasticité, allongement, Charpy en PCR). La PLS est meilleure que la PCR
+    sur la résistance à la traction et le Charpy.
+  \item \textbf{Le nombre d'axes retenu change d'un pli à l'autre} (de 2 à 25 pour la
+    limite d'élasticité) : aucun petit nombre d'axes ne résume la qualité d'une soudure,
+    ce que laissait prévoir l'ACP descriptive (deux axes pour \SI{38}{\percent} de la
+    variance, section~\ref{sec:exploration}).
+\end{itemize}
+
+\outrouver{notebook \code{modeles.ipynb}, partie 5 (\code{regression_acp},
+\code{regression_pls}, nombre d'axes choisi dans chaque pli).}
 
 \subsubsection{Arbres et méthodes d'ensemble}
 
@@ -467,32 +525,13 @@ réserve filtrée par article) ; \code{preprocessing/self_training.py}
 COREG, 7.6 : auto-apprentissage, 7.7 : vues et réserve) ; figures
 \code{coreg_predit_reel.pdf}, \code{foret_auto_predit_reel.pdf}.}
 
-\afaire{\item Relancer \code{modeles.ipynb} en entier : les sorties de la partie 7 viennent
-    d'une exécution antérieure à celle des parties 6 et 9 ; mettre à jour les
-    tableaux~\ref{tab:semi} et~\ref{tab:vues}.
-  \item Dans le notebook, certains constats (7.2, 7.7) citent des chiffres qui ne
-    correspondent pas aux tableaux affichés juste au-dessus : à corriger.
-  \item Vérifier le nombre de lignes réellement ajoutées par l'auto-apprentissage
-    (\code{n_ajoutes_}), surtout pour le Charpy.}
-
 \subsection{Conclusion de la modélisation}\label{sec:resultats}
 
-\afaire{\item Tableau comparatif des modèles par cible (moyenne $\pm$ écart-type sur les plis).
-  \item Figures prédit / réel.
-  \item Poids des indicateurs « valeur manquante » (section~\ref{sec:prep-manquantes}) :
-    comparer avec et sans.
-  \item Modèle retenu pour chaque cible et limites (peu d'articles, extrapolation).
-  \item Chacun présente sa famille de modèles aux autres avant le partiel.}
-
-% Gabarit de tableau à remplir
-% \begin{table}[!htbp]
-%   \centering\small
-%   \begin{tabular}{@{}lccc@{}}
-%     \toprule
-%     \textbf{Modèle} & \textbf{RMSE (MPa)} & \textbf{MAE (MPa)} & $\boldsymbol{R^2}$ \\
-%     \midrule
-%     Ridge  & & & \\
-%     \bottomrule
-%   \end{tabular}
-%   \caption{Limite d'élasticité, validation croisée groupée par article.}
-% \end{table}
+La forêt aléatoire est le meilleur modèle sur les cinq grandeurs (tableau~\ref{tab:arbres}),
+avec un $R^2$ par article de 0,20 (Charpy) à 0,47 (striction). Les modèles linéaires font
+moins bien que la moyenne, sauf après réduction de dimension sur la striction
+(tableau~\ref{tab:reduction}) ; l'apprentissage semi-supervisé n'améliore pas la forêt
+(tableau~\ref{tab:semi}). Pour tous les modèles, l'écart entre découpage aléatoire et
+découpage par article reste le plus grand : la limite vient du passage à une étude
+inconnue plus que du choix du modèle. La forêt est donc retenue pour la classification
+(section~\ref{sec:classification}).

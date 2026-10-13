@@ -24,9 +24,9 @@ obtiendrait-il la classe la plus courante ?}
 code (tableau~\ref{tab:seuils}) :
 \begin{itemize}
   \item \textbf{42} : limite d'élasticité d'au moins \SI{420}{\mega\pascal}, avec un
-    allongement d'au moins \SI{20}{\percent}. C'est la classe qui permet de souder les
-    aciers de construction courants (S355) : le cordon doit être au moins aussi résistant
-    que les pièces qu'il assemble ;
+    allongement d'au moins \SI{20}{\percent}. Cette classe convient aux aciers de
+    construction courants (S355, de limite d'élasticité \SI{355}{\mega\pascal}) : le
+    cordon doit être au moins aussi résistant que les pièces qu'il assemble ;
   \item \textbf{3} : au moins \SI{47}{\joule} à l'essai Charpy mené à
     \SI{-30}{\celsius}, une exigence courante pour une structure exposée au froid.
 \end{itemize}
@@ -185,7 +185,7 @@ ces extrêmes bas : un verdict pris sur une valeur prédite hérite de l'écrase
 sérieux ; un verdict « bonne » ne dispense pas d'essais.
 
 \outrouver{notebook \code{modeles.ipynb}, partie 10.3 (tableau par test et figure),
-10.4 (verdict global), 10.5 (bilan).}
+10.4 (verdict global), 10.5 (conclusion).}
 
 \subsection{Limites}\label{sec:classif-limites}
 
@@ -200,12 +200,29 @@ sérieux ; un verdict « bonne » ne dispense pas d'essais.
     \SI{21}{\celsius} en médiane.
 \end{itemize}
 
-\afaire{\item Décider avec prudence : ne valider un test que si la prédiction dépasse
-    le seuil d'une marge (par exemple une fraction de la RMSE), puis comparer rappel et
-    soudures bonnes rejetées.
-  \item Comparer à un classifieur direct (forêt de classification sur les étiquettes
-    bonne / mauvaise), qui se concentre sur la zone du seuil.
-  \item Seuils par famille d'acier (C-Mn et aciers alliés).}
+\subsection{Conclusion et pistes d'amélioration}\label{sec:classif-conclusion}
+
+\paragraph{Des résultats insatisfaisants.} La démarche est simple et s'appuie sur une
+norme reconnue, mais le verdict obtenu ne protège pas contre les soudures mauvaises : il
+n'en détecte qu'une sur cinq en traction, presque aucune au Charpy, et moins d'une sur
+trois au verdict global. Le problème ne vient pas de la règle elle-même, mais de ce
+qu'on lui donne : des valeurs prédites que la régression a ramenées vers la moyenne, et
+qui franchissent donc rarement le seuil.
+
+\paragraph{Pistes, non traitées faute de temps.}
+\begin{itemize}
+  \item \textbf{Décider avec prudence} : ne valider un test que si la prédiction dépasse
+    le seuil d'une marge, réglée par validation croisée selon le rappel visé.
+  \item \textbf{Prédire directement le verdict} : une forêt de classification entraînée
+    sur les étiquettes bonne / mauvaise de chaque test, avec des classes rééquilibrées,
+    qui apprend la zone du seuil au lieu d'une moyenne.
+  \item \textbf{Prédire une valeur basse probable} plutôt que la moyenne (régression par
+    quantile), pour un verdict prudent par construction.
+  \item \textbf{Charpy sur les seules énergies réellement mesurées}, sans les lignes
+    fixées à \SI{100}{\joule} et \SI{28}{\joule}.
+  \item \textbf{Seuils par famille d'acier} : ISO 2560 pour les aciers C-Mn, ISO 3580
+    pour les aciers alliés.
+\end{itemize}
 
 \paragraph{Références.} ISO 2560:2020, \emph{Produits consommables pour le soudage —
 Électrodes enrobées pour le soudage manuel à l'arc des aciers non alliés et des aciers à
