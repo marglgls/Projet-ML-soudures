@@ -91,8 +91,9 @@ les sorties ; notebook, partie 4 (étape 6) et 5.5 « Liens entre les grandeurs 
 \subsubsection{Validation croisée}
 
 Un modèle est jugé sur des données qu'il n'a pas vues : la \emph{validation croisée}
-découpe les données en 5 parts, entraîne sur 4, teste sur la cinquième, cinq fois, puis
-moyenne les scores. Les lignes d'un même cordon ou d'un même article étant très proches,
+découpe les données en 5 parts, entraîne sur 4 et prédit la cinquième, cinq fois : chaque
+ligne est prédite une fois, par un modèle qui ne l'a pas vue, et les mesures d'erreur sont
+calculées sur l'ensemble de ces prédictions (section~\ref{sec:mesures}). Les lignes d'un même cordon ou d'un même article étant très proches,
 un découpage au hasard serait trop optimiste. Les lignes sont donc regroupées
 \textbf{par article} (\code{GroupKFold}) : le score mesure la capacité à prédire les
 soudures d'une étude inconnue. Une recette mesurée plusieurs fois, fusionnée en une ligne,
@@ -109,7 +110,7 @@ fuite est acceptée pour l'instant.
 \outrouver{fonction \code{weld_source} dans \code{preprocessing/ml_dataset.py} ;
 vérification de l'absence de fuite : notebook, partie 4 (étape 6).}
 
-\subsubsection{Mesures d'erreur}
+\subsubsection{Mesures d'erreur}\label{sec:mesures}
 
 \paragraph{Prédictions hors pli.} La validation croisée prédit chaque ligne une seule
 fois, par le modèle entraîné sans son article. On obtient ainsi, pour les $n$ lignes où la
@@ -206,7 +207,7 @@ la boucle intérieure de la validation croisée.
     Limite d'élasticité      & $-0{,}02$ & $-0{,}78$ & $-0{,}05$ & $-0{,}17$ & $\mathbf{0{,}44}$ \\
     Résistance à la traction & $-0{,}05$ & $-0{,}75$ & $0{,}10$  & $0{,}15$  & $\mathbf{0{,}44}$ \\
     Allongement              & $-0{,}03$ & $-0{,}87$ & $-0{,}06$ & $-0{,}21$ & $\mathbf{0{,}29}$ \\
-    Striction                & $-0{,}13$ & $-0{,}37$ & $0{,}46$ & $0{,}32$ & $\mathbf{0{,}47}$ \\
+    Striction                & $-0{,}13$ & $-0{,}37$ & $\mathbf{0{,}46}$ & $0{,}32$ & $\mathbf{0{,}46}$ \\
     Énergie Charpy           & $-0{,}04$ & $-0{,}89$ & $-0{,}33$ & $0{,}04$  & $\mathbf{0{,}20}$ \\
     \bottomrule
   \end{tabular}
@@ -221,8 +222,8 @@ la boucle intérieure de la validation croisée.
     linéaire} (tableau~\ref{tab:reduction}) : avec peu d'axes, les poids restent modérés et
     la droite extrapole moins. Le $R^2$ passe de $-0{,}37$ à $-0{,}89$ à des valeurs proches
     de 0 ou positives.
-  \item \textbf{Mais seule la striction est bien prédite} : la PCR y égale presque la
-    forêt ($R^2$ de 0,46 contre 0,47). Ailleurs, PCR et PLS font à peine mieux que la moyenne, voire moins
+  \item \textbf{Mais seule la striction est bien prédite} : la PCR y égale la
+    forêt ($R^2$ de 0,46 pour les deux). Ailleurs, PCR et PLS font à peine mieux que la moyenne, voire moins
     bien (limite d'élasticité, allongement, Charpy en PCR). La PLS est meilleure que la PCR
     sur la résistance à la traction et le Charpy.
   \item \textbf{Le nombre d'axes retenu change d'un pli à l'autre} (de 2 à 25 pour la
@@ -329,7 +330,7 @@ Les articles du pli de test ne servent donc jamais à choisir les réglages
     Limite d'élasticité      & $-0{,}02$ & $-0{,}78$ & $0{,}17$  & $0{,}35$ & $\mathbf{0{,}44}$ \\
     Résistance à la traction & $-0{,}05$ & $-0{,}75$ & $0{,}21$  & $0{,}39$ & $\mathbf{0{,}44}$ \\
     Allongement              & $-0{,}03$ & $-0{,}87$ & $-0{,}05$ & $0{,}24$ & $\mathbf{0{,}29}$ \\
-    Striction                & $-0{,}13$ & $-0{,}37$ & $0{,}25$  & $0{,}43$ & $\mathbf{0{,}47}$ \\
+    Striction                & $-0{,}13$ & $-0{,}37$ & $0{,}25$  & $0{,}43$ & $\mathbf{0{,}46}$ \\
     Énergie Charpy           & $-0{,}04$ & $-0{,}89$ & $-0{,}13$ & $0{,}15$ & $\mathbf{0{,}20}$ \\
     \bottomrule
   \end{tabular}
@@ -350,13 +351,13 @@ basse que celle de la moyenne, par exemple \SI{69}{\mega\pascal} au lieu de
     variance ;
   \item \textbf{le bagging} gagne de 0,18 à 0,29 de $R^2$ sur l'arbre : moyenner des
     arbres réduit fortement la variance ;
-  \item \textbf{la forêt} gagne encore de 0,04 à 0,09 : tirer les variables au hasard
+  \item \textbf{la forêt} gagne encore de 0,03 à 0,09 : tirer les variables au hasard
     décorrèle les arbres. Les réglages retenus suivent le plus souvent la théorie : arbres
     profonds (1 à 3 lignes par feuille) et 20 à 50\,\% des variables à chaque découpage.
 \end{itemize}
 
 \paragraph{Biais ou variance ?} Pour la forêt, le $R^2$ vaut 0,93 à 0,97 sur les données
-apprises (faible biais), 0,70 à 0,80 avec un découpage aléatoire, et 0,20 à 0,47 avec le
+apprises (faible biais), 0,70 à 0,80 avec un découpage aléatoire, et 0,20 à 0,46 avec le
 découpage par article. Le plus grand écart reste celui entre découpage aléatoire et
 découpage par article (jusqu'à 0,57 pour le Charpy) : la difficulté principale n'est pas
 la variance du modèle, mais le passage à un article inconnu, dont les aciers et les
@@ -375,7 +376,7 @@ conditions d'essai diffèrent.
   \item \textbf{Extrêmes écrasés} : une forêt moyenne des valeurs vues et tire ses
     prédictions vers le centre (figure~\ref{fig:foret}). Elle ne prédit jamais plus de
     \SI{654}{\mega\pascal} de limite d'élasticité (\SI{920}{\mega\pascal} en réalité), ni
-    moins de \SI{31}{\joule} au Charpy alors que des soudures fragiles ont
+    moins de \SI{30}{\joule} au Charpy alors que des soudures fragiles ont
     \SI{3}{\joule} : les soudures qu'on cherche à éviter sont surestimées.
   \item \textbf{Règles trompeuses} : l'arbre de la limite d'élasticité
     (figure~\ref{fig:arbre}) découpe d'abord sur le molybdène, le manganèse, le chrome et
@@ -404,7 +405,7 @@ imbriquée : \code{report/schema_validation_imbriquee.py}.}
 
 \subsubsection{Apprentissage semi-supervisé}\label{sec:semi}
 
-\paragraph{Pourquoi.} Pour chaque cible, 40 à 50\,\% des lignes n'ont pas de mesure :
+\paragraph{Pourquoi.} Pour chaque cible, 47 à 58\,\% des lignes n'ont pas de mesure :
 elles ont des entrées (composition, procédé, traitement) mais pas de sortie. Un modèle
 supervisé les ignore. L'apprentissage semi-supervisé cherche à s'en servir : le modèle
 prédit ces lignes, puis réutilise ses prédictions les plus fiables (\emph{pseudo-étiquettes})
@@ -444,39 +445,39 @@ variables (33 ou 50\,\%) et lignes par feuille (1 ou 5).
     \textbf{Grandeur} & \textbf{Moyenne} & \textbf{kNN 2 vues} & \textbf{COREG} &
     \textbf{Forêt} & \textbf{Forêt auto-app.} \\
     \midrule
-    Limite d'élasticité      & $-0{,}05$ & $0{,}06$  & $-0{,}01$ & $\mathbf{0{,}43}$ & $\mathbf{0{,}43}$ \\
-    Résistance à la traction & $-0{,}01$ & $0{,}13$  & $0{,}16$  & $\mathbf{0{,}49}$ & $0{,}46$ \\
-    Allongement              & $-0{,}04$ & $0{,}12$  & $0{,}11$  & $\mathbf{0{,}23}$ & $0{,}22$ \\
-    Striction                & $-0{,}11$ & $0{,}34$  & $0{,}34$  & $\mathbf{0{,}43}$ & $0{,}42$ \\
-    Énergie Charpy           & $-0{,}03$ & $-0{,}02$ & $-0{,}03$ & $\mathbf{0{,}24}$ & $0{,}23$ \\
+    Limite d'élasticité      & $-0{,}02$ & $-0{,}01$ & $0{,}01$ & $\mathbf{0{,}44}$ & $0{,}42$ \\
+    Résistance à la traction & $-0{,}05$ & $0{,}03$  & $0{,}07$ & $\mathbf{0{,}44}$ & $0{,}43$ \\
+    Allongement              & $-0{,}03$ & $0{,}01$  & $0{,}02$ & $\mathbf{0{,}29}$ & $0{,}26$ \\
+    Striction                & $-0{,}13$ & $0{,}30$  & $0{,}31$ & $0{,}46$ & $\mathbf{0{,}47}$ \\
+    Énergie Charpy           & $-0{,}04$ & $0{,}04$  & $0{,}03$ & $0{,}20$ & $\mathbf{0{,}22}$ \\
     \bottomrule
   \end{tabular}
   \caption{$R^2$ en validation croisée par article des méthodes semi-supervisées, face
     à leur version supervisée (kNN 2 vues pour le COREG, forêt pour l'auto-apprentissage).
-    Chiffres d'une exécution du notebook légèrement antérieure à celle du
-    tableau~\ref{tab:arbres}, d'où de petits écarts (forêt : 0,43 au lieu de 0,44 pour la
-    limite d'élasticité).}
+    En gras, le meilleur des deux méthodes à base de forêt.}
   \label{tab:semi}
 \end{table}
 
-\paragraph{Résultats.} Aucune des deux méthodes ne fait mieux que la forêt supervisée
-(tableau~\ref{tab:semi}) :
+\paragraph{Résultats.} Aucune des deux méthodes ne fait nettement mieux que la forêt
+supervisée (tableau~\ref{tab:semi}) :
 \begin{itemize}
   \item \textbf{la réserve n'apporte rien.} Le COREG fait jeu égal avec les mêmes kNN sans
-    réserve (écarts de $-0{,}07$ à $+0{,}03$) ; l'auto-apprentissage fait jeu égal avec
-    la forêt, ou un peu moins bien (de 0 à $-0{,}03$). Sur la striction, le COREG obtient
-    exactement le même score avec ou sans réserve (0,34, RMSE \SI{7,32}{\percent}), et une
-    réserve de 250 candidats le dégrade (0,31) ;
+    réserve (écarts de $-0{,}01$ à $+0{,}04$). L'auto-apprentissage fait jeu égal avec
+    la forêt (écarts de $-0{,}03$ à $+0{,}02$) : un peu mieux sur la striction et le
+    Charpy, un peu moins bien sur les trois autres grandeurs, des écarts trop faibles pour
+    conclure à un gain. Sur la striction, le COREG obtient presque le même score avec ou
+    sans réserve (0,31 contre 0,30), et une réserve de 250 candidats n'aide pas (0,32 en
+    moyenne sur trois graines, comme avec 100) ;
   \item \textbf{la base fait tout l'écart} : l'auto-apprentissage dépasse le COREG de
-    0,08 (striction) à 0,44 (limite d'élasticité), soit l'écart entre une forêt et des
+    0,16 (striction) à 0,41 (limite d'élasticité), soit l'écart entre une forêt et des
     kNN ;
   \item \textbf{même diagnostic de biais et de variance.} Pour l'auto-apprentissage, le
-    $R^2$ vaut 0,96 à 0,98 sur les données apprises, 0,71 à 0,82 avec un découpage
-    aléatoire, 0,22 à 0,46 par article, comme la forêt. L'écart entre découpage aléatoire
+    $R^2$ vaut 0,96 à 0,98 sur les données apprises, 0,70 à 0,83 avec un découpage
+    aléatoire, 0,22 à 0,47 par article, comme la forêt. L'écart entre découpage aléatoire
     et découpage par article reste le plus grand : ajouter des lignes des mêmes articles
     n'aide pas à prédire un article inconnu ;
   \item \textbf{extrêmes toujours écrasés} : ni le COREG ni l'auto-apprentissage ne
-    prédisent les soudures fragiles (minimum prédit \SIrange{22}{29}{\joule} au Charpy,
+    prédisent les soudures fragiles (minimum prédit \SIrange{21}{32}{\joule} au Charpy,
     pour \SI{3}{\joule} en réalité).
 \end{itemize}
 
@@ -495,8 +496,8 @@ arbres s'accordent, et ne se dégrade pas.
     \textbf{Vue} & \textbf{Limite d'él.} & \textbf{Rés. traction} & \textbf{Allongement} &
     \textbf{Striction} & \textbf{Charpy} \\
     \midrule
-    Composition & $0{,}41$  & $0{,}52$  & $0{,}20$  & $0{,}45$ & $-0{,}01$ \\
-    Procédé     & $-0{,}25$ & $-0{,}26$ & $-0{,}06$ & $0{,}16$ & $0{,}12$ \\
+    Composition & $0{,}43$  & $0{,}39$  & $0{,}26$  & $0{,}49$ & $-0{,}08$ \\
+    Procédé     & $-0{,}31$ & $-0{,}26$ & $-0{,}14$ & $0{,}11$ & $0{,}14$ \\
     \bottomrule
   \end{tabular}
   \caption{$R^2$ par article d'une forêt entraînée sur une seule vue du COREG.}
@@ -515,7 +516,7 @@ arbres s'accordent, et ne se dégrade pas.
 prédiction : la difficulté vient du passage à un article inconnu, pas du manque de lignes
 mesurées dans les articles connus. Nous gardons la forêt supervisée, plus simple. Le
 tableau~\ref{tab:vues} suggère aussi une piste : la composition seule fait presque aussi
-bien que toutes les entrées (et mieux pour la striction et la traction), ce qui plaide
+bien que toutes les entrées (et mieux pour la striction : 0,49 contre 0,46), ce qui plaide
 pour une sélection de variables.
 
 \outrouver{\code{preprocessing/coreg.py} (\code{COREGRegressor}, \code{evaluer_semi} :
@@ -527,10 +528,10 @@ COREG, 7.6 : auto-apprentissage, 7.7 : vues et réserve) ; figures
 
 \subsection{Conclusion de la modélisation}\label{sec:resultats}
 
-La forêt aléatoire est le meilleur modèle sur les cinq grandeurs (tableau~\ref{tab:arbres}),
-avec un $R^2$ par article de 0,20 (Charpy) à 0,47 (striction). Les modèles linéaires font
+La forêt aléatoire est le meilleur modèle supervisé sur les cinq grandeurs
+(tableau~\ref{tab:arbres}), avec un $R^2$ par article de 0,20 (Charpy) à 0,46 (striction). Les modèles linéaires font
 moins bien que la moyenne, sauf après réduction de dimension sur la striction
-(tableau~\ref{tab:reduction}) ; l'apprentissage semi-supervisé n'améliore pas la forêt
+(tableau~\ref{tab:reduction}) ; l'apprentissage semi-supervisé n'améliore pas nettement la forêt
 (tableau~\ref{tab:semi}). Pour tous les modèles, l'écart entre découpage aléatoire et
 découpage par article reste le plus grand : la limite vient du passage à une étude
 inconnue plus que du choix du modèle. La forêt est donc retenue pour la classification

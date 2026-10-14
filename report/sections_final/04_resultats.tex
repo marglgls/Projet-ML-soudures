@@ -1,6 +1,73 @@
 \section{Résultats et comparaison}
 
-% À rédiger à partir du rapport complet (rapport.tex).
-% Semi-supervisé (rapport complet, section « Apprentissage semi-supervisé ») : une ou deux
-% phrases suffisent. COREG et auto-apprentissage adossé à la forêt ne font pas mieux que la
-% forêt supervisée : la réserve de lignes non mesurées n'aide pas à prédire un article inconnu.
+\begin{table}[!htbp]
+  \centering\footnotesize
+  \begin{tabular}{@{}l r r r r r r r r @{\hspace{1em}} r r@{}}
+    \toprule
+    & \multicolumn{8}{c}{$R^2$ par article} & \multicolumn{2}{c}{RMSE} \\
+    \cmidrule(lr){2-9}\cmidrule(l){10-11}
+    \textbf{Grandeur} & \textbf{Moy.} & \textbf{Lin.} & \textbf{PCR} & \textbf{PLS} &
+    \textbf{Arbre} & \textbf{Bagg.} & \textbf{Forêt} & \textbf{Auto.} & \textbf{Moy.} & \textbf{Forêt} \\
+    \midrule
+    Limite d'élasticité (\si{\mega\pascal}) & $-0{,}02$ & $-0{,}78$ & $-0{,}05$ & $-0{,}17$ & $0{,}17$  & $0{,}35$ & $\mathbf{0{,}44}$ & $0{,}42$ & 93,2 & 69,2 \\
+    Rés. à la traction (\si{\mega\pascal})  & $-0{,}05$ & $-0{,}75$ & $0{,}10$  & $0{,}15$  & $0{,}21$  & $0{,}39$ & $\mathbf{0{,}44}$ & $0{,}43$ & 90,8 & 66,4 \\
+    Allongement (\%)                        & $-0{,}03$ & $-0{,}87$ & $-0{,}06$ & $-0{,}21$ & $-0{,}05$ & $0{,}24$ & $\mathbf{0{,}29}$ & $0{,}26$ & 4,98 & 4,13 \\
+    Striction (\%)                          & $-0{,}13$ & $-0{,}37$ & $0{,}46$  & $0{,}32$  & $0{,}25$  & $0{,}43$ & $0{,}46$ & $\mathbf{0{,}47}$ & 9,62 & 6,62 \\
+    Énergie Charpy (\si{\joule})            & $-0{,}04$ & $-0{,}89$ & $-0{,}33$ & $0{,}04$  & $-0{,}13$ & $0{,}15$ & $0{,}20$ & $\mathbf{0{,}22}$ & 49,7 & 43,6 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Performances en validation croisée imbriquée groupée par article (prédictions
+    hors pli). Moy. : référence (moyenne) ; Lin. : régression linéaire ; Bagg. :
+    bagging ; Auto. : forêt avec auto-apprentissage (semi-supervisé). Un $R^2$ négatif
+    signifie pire que la moyenne.}
+  \label{tab:f-resultats}
+\end{table}
+
+\paragraph{La forêt aléatoire est le meilleur modèle supervisé} sur les cinq grandeurs
+(tableau~\ref{tab:f-resultats}) : $R^2$ de 0,20 à 0,46, RMSE de 12\,\% (Charpy) à
+31\,\% (striction) sous celle de la moyenne.
+\begin{itemize}
+  \item \textbf{La régression linéaire fait pire que la moyenne.} Elle capte pourtant une
+    tendance ($R^2$ de 0,54 à 0,73 sur les données apprises), mais une droite extrapole
+    hors du domaine des autres articles (jusqu'à \SI{-185}{\joule} prédits au Charpy), et
+    les entrées corrélées (courant et tension) reçoivent des poids opposés et instables.
+    PCR et PLS, en supprimant ces corrélations, corrigent l'essentiel de cet échec, mais
+    restent linéaires : seule la striction est bien prédite (PCR : 0,46, autant que la
+    forêt).
+  \item \textbf{Chaque méthode d'arbres améliore la précédente.} L'arbre seul bat la
+    moyenne sur trois grandeurs, car il n'extrapole pas, mais sa profondeur optimale
+    varie de 2 à « sans limite » selon les plis : c'est sa variance. Le bagging la
+    réduit (+0,18 à +0,29 de $R^2$), la forêt encore (+0,03 à +0,09).
+  \item \textbf{Le semi-supervisé n'apporte pas de gain net.} L'auto-apprentissage fait
+    jeu égal avec la forêt supervisée (écarts de $-0{,}03$ à $+0{,}02$ : un peu mieux sur
+    la striction et le Charpy, un peu moins bien ailleurs) ; COREG fait jeu égal avec les
+    mêmes plus proches voisins sans données non étiquetées, et reste loin derrière la
+    forêt ($R^2$ de 0,01 à 0,31). Ses deux vues ne sont pas complémentaires : pour les
+    propriétés de traction, la composition porte presque tout le signal, et la vue
+    procédé, seule, fait moins bien que la moyenne sur trois d'entre elles.
+\end{itemize}
+
+\paragraph{La difficulté principale : passer à une étude inconnue.} Pour la forêt, le
+$R^2$ vaut 0,93 à 0,97 sur les données apprises, 0,70 à 0,80 avec un découpage au
+hasard, et 0,20 à 0,46 par article. Le plus grand écart est le dernier (jusqu'à 0,57
+pour le Charpy) : la forêt surapprend un peu, mais surtout, chaque article a ses aciers
+et ses conditions d'essai. Régulariser n'y change rien (la validation croisée choisit presque
+toujours les arbres les plus profonds), et le semi-supervisé n'ajoute que des lignes des mêmes
+articles.
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\linewidth]{foret_predit_reel}
+  \caption{Forêt aléatoire : valeurs prédites hors pli contre valeurs réelles. Les
+    extrêmes sont ramenés vers la moyenne.}
+  \label{fig:f-foret}
+\end{figure}
+
+\paragraph{Des extrêmes écrasés, un verdict trop optimiste.} Une forêt moyenne des
+valeurs vues : elle ne prédit jamais moins de \SI{30}{\joule} au Charpy, alors que des
+soudures fragiles n'absorbent que \SI{3}{\joule} (figure~\ref{fig:f-foret}). Or les
+soudures mauvaises sont justement ces extrêmes bas. Le verdict ISO 2560 n'en détecte que
+27 sur 93 (rappel de la classe « mauvaise » : 0,29, sur les 182 soudures mesurées à la
+fois en traction et au Charpy), et presque aucune au seul Charpy (4 sur 237). Quand il
+déclare une soudure mauvaise, il a souvent raison (précision de 0,71) ; un verdict
+« bonne » ne dispense pas d'essais.

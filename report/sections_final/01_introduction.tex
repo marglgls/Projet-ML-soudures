@@ -1,3 +1,20 @@
 \section{Introduction}
 
-% À rédiger à partir du rapport complet (rapport.tex).
+La qualité des soudures sur acier est un enjeu industriel majeur (soudure des tubes
+d'éoliennes, par exemple), et la connaissance des bons réglages se transmet surtout
+d'expert à expert. Ce projet cherche à extraire cette connaissance d'une base publique
+d'essais, puis à en tirer des recommandations.
+
+\paragraph{Traduction en problème d'apprentissage.} La base ne contient aucune variable
+« qualité ». Nous la définissons par les trois propriétés que vérifient les normes de
+soudage \cite{iso2560,awsa51} : la \emph{résistance} (limite d'élasticité), la
+\emph{ductilité} (allongement) et la \emph{ténacité}, résistance aux chocs (énergie
+Charpy). Le problème devient trois tâches de \textbf{régression supervisée}, à partir de
+la composition, des réglages de soudage et du traitement thermique ; deux grandeurs
+proches (résistance à la traction, striction) sont prédites en complément. La soudure
+est ensuite jugée bonne si chaque valeur prédite atteint le seuil de la norme. Une
+classification directe « bonne / mauvaise » serait moins adaptée : les seuils dépendent
+de l'usage, un verdict binaire perd l'information (\SI{46}{\joule} et \SI{10}{\joule}
+seraient tous deux « mauvais » face à un seuil de \SI{47}{\joule}), et les trois
+propriétés sont rarement mesurées sur la même ligne. La base n'étant que partiellement
+étiquetée, nous testons aussi des méthodes \textbf{semi-supervisées}.

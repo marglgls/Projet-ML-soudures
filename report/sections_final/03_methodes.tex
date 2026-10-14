@@ -1,3 +1,63 @@
 \section{Méthodes et protocole de validation}
 
-% À rédiger à partir du rapport complet (rapport.tex).
+\paragraph{Une régression par propriété.} Chaque grandeur a son modèle, entraîné sur
+les lignes où elle est mesurée. Pour le Charpy, la température d'essai est une
+\emph{entrée} : la même soudure absorbe \SI{39}{\joule} à \SI{-60}{\celsius} et
+\SI{114}{\joule} à \SI{0}{\celsius}. Ce n'est pas un levier : elle est imposée par
+l'usage de la pièce et reste fixée dans les recommandations.
+
+\paragraph{Protocole d'évaluation.}\label{sec:f-protocole} Tous les modèles suivent le
+même protocole, pour être comparables \cite{hastie2009,pedregosa2011} :
+\begin{itemize}
+  \item \textbf{validation croisée groupée par article} (\code{GroupKFold}, 5 plis) :
+    toutes les lignes d'un article sont dans le même pli. Un découpage au hasard
+    mettrait des soudures quasi identiques en entraînement et en test, et serait trop
+    optimiste. Le score mesure la capacité à prédire une \emph{étude inconnue} ;
+  \item \textbf{validation croisée imbriquée} \cite{varma2006} : dans chaque pli, une
+    boucle intérieure (elle aussi par article) choisit les hyperparamètres sur la seule
+    partie entraînement ; le pli de test ne sert jamais au réglage ;
+  \item \textbf{pré-traitement dans un \code{Pipeline}} : imputation, encodage et
+    standardisation sont réappris dans chaque pli, sans fuite d'information.
+\end{itemize}
+
+\paragraph{Mesures d'erreur.} Chaque ligne est prédite une fois, par un modèle qui ne l'a
+pas vue. Sur les $n$ couples (valeur réelle $y_i$, prédiction $\hat y_i$) :
+\[
+  \mathrm{RMSE} = \sqrt{\tfrac{1}{n}\textstyle\sum_i (y_i - \hat y_i)^2}, \qquad
+  \mathrm{MAE} = \tfrac{1}{n}\textstyle\sum_i \lvert y_i - \hat y_i \rvert, \qquad
+  R^2 = 1 - \dfrac{\sum_i (y_i - \hat y_i)^2}{\sum_i (y_i - \bar y)^2}.
+\]
+La RMSE, dans l'unité de la cible, pèse fortement les grosses erreurs, les plus graves
+ici (rater une soudure fragile) ; c'est aussi ce que minimise le réglage. La MAE donne
+l'erreur typique. Le $R^2$ compare le modèle à une prédiction constante égale à la
+moyenne : 0 signifie « pas mieux que la moyenne », un $R^2$ négatif « pire ». Il permet
+de comparer des cibles d'unités différentes. Les mesures sont calculées sur toutes les
+prédictions réunies, car un $R^2$ par pli serait instable ; l'écart-type de la RMSE entre
+plis mesure la stabilité.
+
+\paragraph{Modèles comparés.}
+\begin{itemize}
+  \item \textbf{Référence} : la moyenne de l'entraînement, le minimum à battre.
+  \item \textbf{Régression linéaire}, puis \textbf{régression sur composantes principales
+    (PCR) et PLS} \cite{wold2001}, qui résument les entrées corrélées en quelques axes
+    (nombre d'axes réglé par validation croisée).
+  \item \textbf{Arbre de régression} \cite{breiman1984}, \textbf{bagging}
+    \cite{breiman1996} et \textbf{forêt aléatoire} \cite{breiman2001} : un arbre gère
+    seuils et interactions et n'extrapole pas, mais a une forte variance ; le bagging
+    moyenne 300 arbres entraînés sur des tirages des lignes, et la forêt tire en plus
+    une partie des variables à chaque découpage, ce qui décorrèle les arbres. Réglages :
+    profondeur et taille des feuilles, part des variables tirées.
+  \item \textbf{Semi-supervisé} \cite{zhu2009} : pour chaque cible, 47 à 58\,\% des lignes
+    ont des entrées mais pas de mesure. L'\emph{auto-apprentissage} réentraîne la forêt
+    avec ses propres prédictions sur ces lignes, en ne gardant que celles où ses arbres
+    s'accordent. La co-régression \emph{COREG} \cite{zhou2005}, issue du co-apprentissage
+    \cite{blum1998}, entraîne deux régresseurs des plus proches voisins sur deux vues
+    (composition ; procédé et traitement) qui s'étiquettent mutuellement ces lignes. Ces
+    deux méthodes sont les plus simples à adosser à nos modèles, et COREG est conçue
+    pour la régression.
+  \item \textbf{Verdict « bonne / mauvaise »} : les prédictions hors pli de la forêt sont
+    comparées aux seuils de la classe ISO 2560 E~42~3 \cite{iso2560} : limite
+    d'élasticité $\geq$ \SI{420}{\mega\pascal}, allongement $\geq$ \SI{20}{\percent},
+    Charpy $\geq$ \SI{47}{\joule} à \SI{-30}{\celsius}. La soudure est bonne si elle
+    passe les trois.
+\end{itemize}

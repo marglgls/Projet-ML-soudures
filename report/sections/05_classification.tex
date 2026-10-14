@@ -81,7 +81,7 @@ aléatoire, meilleur modèle de la section~\ref{sec:modeles}, et ses prédiction
 son pli, donc sans son propre article. C'est la situation réelle d'une soudure issue
 d'une étude que le modèle ne connaît pas. Juger le verdict sur des prédictions faites
 avec les données d'entraînement serait trop optimiste ($R^2$ de 0,93 à 0,97 au lieu de
-0,20 à 0,47).
+0,20 à 0,46).
 
 \paragraph{La décision.} Pour chaque test, la valeur prédite est comparée au seuil :
 test passé si elle l'atteint. La soudure est déclarée bonne si les trois tests sont
@@ -176,7 +176,7 @@ trois occasions d'être rejetée, mais l'essentiel des mauvaises passe.
 prédit une moyenne de soudures déjà vues ; elle écrase donc les valeurs extrêmes
 (section~\ref{sec:modeles}). Elle ne prédit sous le seuil que \SI{5}{\percent} des
 lignes en limite d'élasticité, \SI{3}{\percent} en allongement et \SI{1}{\percent} au
-Charpy (jamais moins de \SI{31}{\joule}), alors que 14, 12 et \SI{28}{\percent} des
+Charpy (jamais moins de \SI{30}{\joule}), alors que 14, 12 et \SI{28}{\percent} des
 lignes sont réellement sous le seuil. Une soudure faible est prédite « dans la
 moyenne », donc au-dessus du seuil. Or la classe « mauvaise » est justement faite de
 ces extrêmes bas : un verdict pris sur une valeur prédite hérite de l'écrasement.

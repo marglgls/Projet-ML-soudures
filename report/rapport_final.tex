@@ -12,29 +12,30 @@
 \suivifalse  % pas d'encadrés de travail dans le rapport rendu
 
 \input{preambule}
+\usepackage{pgfgantt}
 
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{\small Prédiction de qualité de soudures}
-\rhead{\small Équipe \numequipe}
+\rhead{\small Projet Machine Learning}
 \cfoot{\thepage}
 
-\newcommand{\numequipe}{??} % TODO numéro d'équipe
 
 \begin{document}
 
 % ---------------------------------------------------------------- page de titre
-% Le sujet demande : noms, numéro d'équipe, date, mails et titre en première page.
+% Le sujet demande : noms, numéro d'équipe (l'équipe n'en a pas), date, mails et titre en première page.
 \begin{center}
   {\LARGE\bfseries Prédiction de qualité de soudures}\\[6pt]
   {\large Projet Machine Learning --- CentraleSupélec, 3A}\\[14pt]
   \begin{tabular}{c@{\hspace{2.5em}}c}
     Pablo Bosch & Myriam Boulaares \\
-    \footnotesize\texttt{?} & \footnotesize\texttt{myriam.boulaares@student-cs.fr} \\[6pt]
+    \footnotesize\texttt{pablo.bosch@student-cs.fr} & \footnotesize\texttt{myriam.boulaares@student-cs.fr} \\[6pt]
     Salomé Fonvielle & Margaux Langlois \\
-    \footnotesize\texttt{salome.fonvielle@gmail.com} & \footnotesize\texttt{?}
+    \footnotesize\texttt{salome.fonvielle@student-cs.fr} & \footnotesize\texttt{margaux.langlois@student-cs.fr}
   \end{tabular}\par\vspace{8pt}
-  Équipe n\textsuperscript{o}~\numequipe \quad --- \quad \today
+  \today\\[4pt]
+  {\small Code : \url{https://github.com/marglgls/Projet-ML-soudures}}
 \end{center}
 \thispagestyle{fancy}
 
@@ -43,5 +44,7 @@
 \input{sections_final/03_methodes}
 \input{sections_final/04_resultats}
 \input{sections_final/05_conclusion}
+
+\input{bibliographie}
 
 \end{document}

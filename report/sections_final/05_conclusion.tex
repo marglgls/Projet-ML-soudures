@@ -1,3 +1,65 @@
-\section{Conclusion et recommandations}
+\section{Discussion et conclusion}
 
-% À rédiger à partir du rapport complet (rapport.tex).
+\paragraph{L'approche la plus appropriée.} Prédire séparément résistance, ductilité et
+ténacité, puis les comparer aux seuils d'une norme, avec une forêt aléatoire réglée par
+validation croisée imbriquée groupée par article. Elle surpasse les modèles linéaires et
+la réduction de dimension ; sa variante semi-supervisée ne fait pas nettement mieux, et
+nous gardons la forêt supervisée, plus simple. Mais ses performances restent modestes
+sur une étude inconnue ($R^2$ de 0,20 à 0,46), et le verdict tiré de ses prédictions
+laisse passer la plupart des soudures mauvaises : en l'état, le modèle peut trier des
+recettes candidates, pas remplacer les essais.
+
+\paragraph{Recommandations, avec prudence.} Les tendances suivantes ressortent à la fois
+des corrélations, des modèles et de la métallurgie :
+\begin{itemize}
+  \item les éléments d'alliage (Mo, Mn, V, Cr, Nb) augmentent la résistance mais
+    réduisent la ductilité : une bonne soudure est un compromis, à régler selon l'usage ;
+  \item un traitement thermique plus chaud ou plus long abaisse la résistance ;
+  \item un fort apport de chaleur au soudage et les impuretés (S, P) vont avec une
+    striction plus faible ; l'énergie de soudage, qui intègre courant, tension et
+    vitesse, est le réglage à suivre ;
+  \item la ténacité se juge à la température d'usage : une soudure satisfaisante à
+    \SI{0}{\celsius} peut être fragile à \SI{-40}{\celsius}.
+\end{itemize}
+Ce sont des corrélations issues de données publiées, pas des causes : les aciers alliés
+étant presque toujours traités, l'effet des alliages et celui du traitement ne se
+séparent pas. Des essais contrôlés, menés avec des experts matériaux, seraient
+nécessaires pour les confirmer.
+
+\paragraph{Pistes.} Des données plus variées (plus d'articles et d'aciers), des modèles
+par famille d'acier, un verdict prudent (marge sur le seuil, régression par quantile ou
+classification apprise sur la zone du seuil), et un traitement à part des énergies
+Charpy fixées à \SI{100}{\joule} et \SI{28}{\joule}, qui semblent résumer une courbe
+plutôt que mesurer un essai.
+
+\paragraph{Organisation de l'équipe.} La figure~\ref{fig:gantt} résume le partage des
+tâches.
+
+% Diagramme construit à partir de l'historique du dépôt git : dates et répartition
+% à vérifier par l'équipe avant le rendu.
+\begin{figure}[!htbp]
+  \centering\small
+  \begin{ganttchart}[
+      time slot format=isodate,
+      x unit=0.62cm, y unit chart=0.42cm, y unit title=0.5cm,
+      title height=1, bar height=0.6, bar top shift=0.2,
+      title label font=\scriptsize, bar label font=\scriptsize,
+      bar/.append style={fill=NavyBlue!55, draw=NavyBlue},
+      vgrid={*1{black!10}}, hgrid
+    ]{2026-09-30}{2026-10-14}
+    \gantttitlecalendar{day} \\
+    \ganttbar{Récupération et description des données (Margaux)}{2026-09-30}{2026-10-02} \\
+    \ganttbar{Exploration des données (Myriam, Salomé)}{2026-10-02}{2026-10-03} \\
+    \ganttbar{Nettoyage et pré-traitement (Margaux, Salomé, Pablo)}{2026-10-02}{2026-10-08} \\
+    \ganttbar{ACP (Myriam, Salomé)}{2026-10-03}{2026-10-11} \\
+    \ganttbar{Protocole commun, arbres et forêts (Salomé)}{2026-10-09}{2026-10-10} \\
+    \ganttbar{Régression linéaire (Pablo)}{2026-10-08}{2026-10-13} \\
+    \ganttbar{Réduction de dimension (Myriam)}{2026-10-11}{2026-10-13} \\
+    \ganttbar{Semi-supervisé (Margaux)}{2026-10-11}{2026-10-12} \\
+    \ganttbar{Verdict ISO 2560 (Pablo)}{2026-10-13}{2026-10-13} \\
+    \ganttbar{Rédaction des rapports (Salomé, Pablo)}{2026-10-03}{2026-10-14}
+  \end{ganttchart}
+  \caption{Diagramme de Gantt : tâches, durée et membres de l'équipe (jours de
+    septembre et octobre 2026).}
+  \label{fig:gantt}
+\end{figure}
